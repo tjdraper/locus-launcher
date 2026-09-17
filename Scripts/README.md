@@ -8,9 +8,11 @@ The script bumps the version, archives, exports a Developer ID build, notarizes 
 
 `CFBundleVersion` is set to the same value as the marketing version, so there is only one number to track. Sparkle compares `CFBundleVersion`, which means a version that has shipped can never be rebuilt under the same name — ship a new version instead. The script refuses a version you have already tagged.
 
-Release notes are optional. Put them in `Releases/<version>.md` and the script links them from the appcast and copies them into `docs/` so Sparkle can fetch them.
+Release notes are optional but belong in `Releases/<version>.md`, written before you run the script. Sparkle renders Markdown, so headings and lists work. The script links the file from the appcast and copies it into `docs/` so Sparkle can fetch it, and warns during preflight if the file is missing.
 
-If a release fails partway, undo the version bump with `git checkout -- "Locus Launcher.xcodeproj/project.pbxproj"`.
+The script refuses to run unless the branch is clean, has an upstream, and is exactly in sync with it. The release tag has to land on the commit the build came from, which is impossible if there is unpushed work in the way.
+
+If a release fails partway, undo the version bump and the appcast entry with `git checkout -- "Locus Launcher.xcodeproj/project.pbxproj" docs`.
 
 ## One-time setup
 

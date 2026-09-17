@@ -45,9 +45,25 @@ step "Checking prerequisites"
 
 [[ -z "$(git status --porcelain)" ]] || fail "working tree is dirty; commit or stash first"
 
+readonly BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+UPSTREAM="$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null)" \
+    || fail "$BRANCH has no upstream branch, so there is nothing to tag against"
+readonly UPSTREAM
+
+git fetch --quiet --tags
+
 # The build number is the version, so a released version can never be rebuilt under the same name.
 git rev-parse --verify --quiet "refs/tags/v$VERSION" >/dev/null \
     && fail "v$VERSION is already tagged; pick a new version"
+
+# The tag has to land on the commit this build came from, so nothing else may be unpushed.
+[[ "$(git rev-list --count "$UPSTREAM..HEAD")" == "0" ]] \
+    || fail "$BRANCH is ahead of $UPSTREAM; push before releasing"
+[[ "$(git rev-list --count "HEAD..$UPSTREAM")" == "0" ]] \
+    || fail "$BRANCH is behind $UPSTREAM; pull before releasing"
+
+[[ -f "$RELEASE_NOTES" ]] \
+    || echo "note: no Releases/$VERSION.md, so this release ships without release notes" >&2
 
 security find-identity -v -p codesigning | grep -q "Developer ID Application" \
     || fail "no Developer ID Application certificate in the keychain (see Scripts/README.md)"
@@ -158,12 +174,16 @@ Built and notarized $APP_NAME $VERSION.
   app: $EXPORTED_APP
   zip: $ZIP
 
-Publish in this order, so the download exists before the feed points at it:
+Publish in this order. The tag lands on the release commit, and the download goes live before
+the feed points at it:
 
-  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION"$( [[ -f "$RELEASE_NOTES" ]] && echo " --notes-file Releases/$VERSION.md" )
-  git add "$PBXPROJ" docs && git commit -m "Release $VERSION" && git push
+  git add "$PBXPROJ" docs && git commit -m "Release $VERSION"
+  git tag v$VERSION
+  git push origin v$VERSION
+  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION" --verify-tag$( [[ -f "$RELEASE_NOTES" ]] && echo " --notes-file Releases/$VERSION.md" )
+  git push
 
-If you stop here, undo the version bump with:
+If you stop here, undo the version bump and the appcast entry with:
 
-  git checkout -- "$PBXPROJ"
+  git checkout -- "$PBXPROJ" docs
 EOF
