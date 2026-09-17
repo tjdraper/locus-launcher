@@ -54,7 +54,7 @@ Other rules:
 - If a comment explains what code does, that's a naming problem. Rename the variable, rename the method, or extract a named collaborator instead.
 - Keep comments to a sentence or two. Length does not add authority.
 - Do not remove or rewrite an existing comment unless the code it describes changed. An unexplained comment may be recording something you can't see.
-- The `// Arrange`, `// Act`, `// Assert` markers in tests are a required structural convention, not commentary. Keep them. See `Testing.md`.
+- The `// Arrange`, `// Act`, `// Assert` markers in tests are a required structural convention, not commentary. Keep them.
 - Keep comments as close to the thing being commented on as possible. This helps reduce cognitive overhead.
 
 ## Architecture Rules
@@ -79,7 +79,7 @@ Other rules:
 
 ## Reference Shape
 
-- Treat `TodoBrowsing/` as the reference example for the preferred structure in this codebase:
+- No feature folder has been named as the reference example yet. Once one clearly shows the preferred structure, name it here. The target shape:
   - thin top-level view composition
   - feature-local workflows and coordinators
   - nearby state and supporting objects
@@ -97,14 +97,13 @@ This repo will be public. Never commit secrets (signing certificates, notarizati
 
 ## Build Quality
 
-The project must build with zero warnings on both iOS and macOS.
+The project is macOS only and must build with zero warnings.
 
-The Xcode `BuildProject` MCP tool builds whichever scheme/destination Xcode currently has selected, and there is no reliable way to detect which platform that was. Do not rely on it for cross-platform coverage. Before reporting work as complete, explicitly run `xcodebuild` for both platforms via the command line:
+The Xcode `BuildProject` MCP tool builds whichever scheme and destination Xcode currently has selected, so do not rely on it. Before reporting work as complete, run `xcodebuild` from the command line:
 
-- macOS: `xcodebuild -project "Locus ToDo.xcodeproj" -scheme "Locus ToDo" -destination "platform=macOS" -configuration Debug build`
-- iOS:   `xcodebuild -project "Locus ToDo.xcodeproj" -scheme "Locus ToDo" -destination "generic/platform=iOS Simulator" -configuration Debug build`
+- `xcodebuild -project "Locus Launcher.xcodeproj" -scheme "Locus Launcher" -destination "platform=macOS" -configuration Debug build`
 
-Check each build log at warning severity and fix any warnings (including SwiftLint violations) on either platform before declaring work done.
+Check the build log at warning severity and fix any warnings (including SwiftLint violations) before declaring work done.
 
 ## Swift 6 Concurrency
 

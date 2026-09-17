@@ -16,13 +16,13 @@ The main goal is locality of behavior:
 
 Good boundaries usually look like:
 
-- `TodoBrowsing/`
-- `TodoDetails/`
-- `TodoEditing/`
-- `TodoSelection/`
-- `Contexts/`
-- `SavedViews/`
-- `SyncStatus/`
+- `LauncherPanel/`
+- `AppIndex/`
+- `AppBrowsing/`
+- `AppSearch/`
+- `AppShortcuts/`
+- `ShortcutSync/`
+- `FirstRun/`
 
 Within a feature area, prefer small named objects such as:
 
@@ -73,7 +73,7 @@ When touching a large file:
 
 ## Reference Example
 
-Use `TodoBrowsing/` as the current reference example for the desired direction:
+No feature has been named as the reference example yet. Once one clearly shows the desired direction, name it here. It should have:
 
 - thin top-level view composition
 - feature-local workflows and coordinators
