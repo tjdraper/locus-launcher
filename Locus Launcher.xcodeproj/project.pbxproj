@@ -6,7 +6,12 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		32159191305C3F46009DC298 /* Locus Launcher.icon in Resources */ = {isa = PBXBuildFile; fileRef = 32159190305C3F46009DC298 /* Locus Launcher.icon */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		32159190305C3F46009DC298 /* Locus Launcher.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "Locus Launcher.icon"; sourceTree = "<group>"; };
 		3215918A305C3F46009DC298 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		3215918B305C3F46009DC298 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3215918C305C3F46009DC298 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
@@ -35,6 +40,7 @@
 			children = (
 				3215917E305C3F44009DC298 /* LocusLauncher */,
 				3215917D305C3F44009DC298 /* Products */,
+				32159190305C3F46009DC298 /* Locus Launcher.icon */,
 				3215918A305C3F46009DC298 /* .swiftlint.yml */,
 				3215918B305C3F46009DC298 /* .gitignore */,
 				3215918C305C3F46009DC298 /* AGENTS.md */,
@@ -114,6 +120,7 @@
 		3215917A305C3F44009DC298 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				32159191305C3F46009DC298 /* Locus Launcher.icon in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -257,7 +264,7 @@
 		32159188305C3F45009DC298 /* Debug configuration for PBXNativeTarget "Locus Launcher" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Locus Launcher";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -288,7 +295,7 @@
 		32159189305C3F45009DC298 /* Release configuration for PBXNativeTarget "Locus Launcher" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "Locus Launcher";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

@@ -1,0 +1,125 @@
+{
+  "fill": {
+    "automatic-gradient": "display-p3:0.85352,0.72754,0.51123,1.00000"
+  },
+  "groups": [
+    {
+      "blur-material": null,
+      "layers": [
+        {
+          "image-name": "lens-gloss.png",
+          "name": "lens-gloss"
+        },
+        {
+          "image-name": "lens-content-light.png",
+          "name": "lens-content-light",
+          "opacity-specializations": [
+            {
+              "appearance": "dark",
+              "value": 0
+            },
+            {
+              "appearance": "tinted",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "image-name": "lens-content-dark.png",
+          "name": "lens-content-dark"
+        }
+      ],
+      "name": "lens",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "blur-material": 1,
+      "layers": [
+        {
+          "glass": true,
+          "image-name": "magnifier.svg",
+          "name": "magnifier"
+        }
+      ],
+      "name": "magnifier",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 1
+      },
+      "translucency": {
+        "enabled": true,
+        "value": 0.66
+      }
+    },
+    {
+      "blur-material": 1,
+      "layers": [
+        {
+          "image-name": "app-tiles.png",
+          "name": "app-tiles"
+        }
+      ],
+      "name": "app-tiles",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 1
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": true,
+        "value": 0
+      }
+    },
+    {
+      "blend-mode": "normal",
+      "blur-material": null,
+      "layers": [
+        {
+          "glass": true,
+          "hidden": false,
+          "image-name": "background-light.png",
+          "name": "background-light",
+          "opacity-specializations": [
+            {
+              "appearance": "dark",
+              "value": 0
+            },
+            {
+              "appearance": "tinted",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "image-name": "background-dark.png",
+          "name": "background-dark"
+        }
+      ],
+      "lighting": "individual",
+      "name": "background",
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "specular": true,
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
+    "squares": "shared"
+  }
+}
