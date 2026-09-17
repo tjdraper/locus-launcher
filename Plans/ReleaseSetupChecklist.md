@@ -37,16 +37,16 @@ The key is already generated and in your login Keychain. Its public half is in `
 
 - [x] Make the repo public.
 - [x] Enable GitHub Pages: repo Settings → Pages → Source **Deploy from a branch**, branch `main`, folder `/docs`.
-- [ ] Commit and push `docs/` so Pages has something to serve.
-- [ ] Confirm `https://tjdraper.github.io/locus-launcher/appcast.xml` loads. That URL is the `SUFeedURL` baked into every build, so it has to work before the first release ships.
-- [ ] Run the app and pick **Check for Updates…**. Against the empty feed it should say you are up to date. An error here means the feed URL is wrong, and it is much cheaper to find out now.
+- [x] Commit and push `docs/` so Pages has something to serve.
+- [x] Confirm `https://tjdraper.github.io/locus-launcher/appcast.xml` loads. That URL is the `SUFeedURL` baked into every build, so it has to work before the first release ships.
+- [x] Run the app and pick **Check for Updates…**. Against the empty feed it should say you are up to date. An error here means the feed URL is wrong, and it is much cheaper to find out now.
 
 ## First release
 
-- [ ] `Scripts/release.sh 1.0.0`
-- [ ] Run the two commands it prints, in the order it prints them.
-- [ ] Download the published zip on a Mac that has never run the app, unzip it in Downloads, and open it. You should get no Gatekeeper warning, and the offer to move it to Applications.
-- [ ] Ship a throwaway `1.0.1` and let an installed `1.0.0` update itself. Sparkle problems only show up on the second release, so do this before anyone else is relying on it.
+- [x] `Scripts/release.sh 1.0.0`
+- [x] Run the two commands it prints, in the order it prints them.
+- [x] Download the published zip on a Mac that has never run the app, unzip it in Downloads, and open it. You should get no Gatekeeper warning, and the offer to move it to Applications.
+- [x] Ship a throwaway `1.0.1` and let an installed `1.0.0` update itself. Sparkle problems only show up on the second release, so do this before anyone else is relying on it.
 
 ## Not set up on purpose
 
