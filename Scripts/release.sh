@@ -45,6 +45,10 @@ step "Checking prerequisites"
 
 [[ -z "$(git status --porcelain)" ]] || fail "working tree is dirty; commit or stash first"
 
+# The build number is the version, so a released version can never be rebuilt under the same name.
+git rev-parse --verify --quiet "refs/tags/v$VERSION" >/dev/null \
+    && fail "v$VERSION is already tagged; pick a new version"
+
 security find-identity -v -p codesigning | grep -q "Developer ID Application" \
     || fail "no Developer ID Application certificate in the keychain (see Scripts/README.md)"
 
@@ -60,13 +64,11 @@ readonly SPARKLE_BIN="$("$REPO_ROOT/Scripts/sparkle-tools.sh")"
 
 # --- Version ---------------------------------------------------------------
 
-current_build="$(grep -m1 'CURRENT_PROJECT_VERSION = ' "$PBXPROJ" | tr -dc '0-9')"
-readonly BUILD_NUMBER=$((current_build + 1))
-
-step "Setting version $VERSION (build $BUILD_NUMBER)"
-# Every release bumps CFBundleVersion, because that is what Sparkle compares.
+step "Setting version $VERSION"
+# CFBundleVersion is what Sparkle compares. Keeping it equal to the marketing version leaves one
+# number to reason about, at the cost of needing a new version to rebuild a released one.
 sed -i '' -E "s/MARKETING_VERSION = [^;]+;/MARKETING_VERSION = $VERSION;/g" "$PBXPROJ"
-sed -i '' -E "s/CURRENT_PROJECT_VERSION = [0-9]+;/CURRENT_PROJECT_VERSION = $BUILD_NUMBER;/g" "$PBXPROJ"
+sed -i '' -E "s/CURRENT_PROJECT_VERSION = [^;]+;/CURRENT_PROJECT_VERSION = $VERSION;/g" "$PBXPROJ"
 
 # --- Archive and export ----------------------------------------------------
 
@@ -151,7 +153,7 @@ fi
 
 cat <<EOF
 
-Built and notarized $APP_NAME $VERSION (build $BUILD_NUMBER).
+Built and notarized $APP_NAME $VERSION.
 
   app: $EXPORTED_APP
   zip: $ZIP

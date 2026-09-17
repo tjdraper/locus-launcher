@@ -6,6 +6,8 @@ Scripts/release.sh 1.0.1
 
 The script bumps the version, archives, exports a Developer ID build, notarizes it, staples the ticket, re-zips the stapled app, and adds the release to `docs/appcast.xml`. It does not publish: it prints the `gh release create` and `git` commands to run, in the order that keeps the download live before the feed points at it.
 
+`CFBundleVersion` is set to the same value as the marketing version, so there is only one number to track. Sparkle compares `CFBundleVersion`, which means a version that has shipped can never be rebuilt under the same name — ship a new version instead. The script refuses a version you have already tagged.
+
 Release notes are optional. Put them in `Releases/<version>.md` and the script links them from the appcast and copies them into `docs/` so Sparkle can fetch them.
 
 If a release fails partway, undo the version bump with `git checkout -- "Locus Launcher.xcodeproj/project.pbxproj"`.
