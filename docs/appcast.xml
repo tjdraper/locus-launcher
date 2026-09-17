@@ -1,6 +1,15 @@
 <?xml version="1.0" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
-	<channel>
-		<title>Locus Launcher</title>
-	</channel>
+    <channel>
+        <title>Locus Launcher</title>
+        <item>
+            <title>2026.0.1</title>
+            <pubDate>Thu, 17 Sep 2026 16:17:14 -0500</pubDate>
+            <link>https://github.com/tjdraper/locus-launcher</link>
+            <sparkle:version>2026.0.1</sparkle:version>
+            <sparkle:shortVersionString>2026.0.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.0.1/LocusLauncher-2026.0.1.zip" length="2540143" type="application/octet-stream" sparkle:edSignature="n4dJl/wT9wCHSLwOki8z9E5bXN7HnoT/FQzaCoTFrW59LqtlRMbli0tbb2IjSt3ZBsu05IYtWX3AdLqoNFiTCA=="/>
+        </item>
+    </channel>
 </rss>
