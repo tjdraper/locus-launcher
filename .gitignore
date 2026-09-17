@@ -10,3 +10,13 @@ DerivedData/
 # Swift Package Manager dependencies (re-downloaded on build)
 .build/
 .swiftpm/
+
+# Local build and archive output
+build/
+
+# Editor settings
+.idea/
+
+# Local signing and release config (secrets stay in the Keychain or environment)
+.env
+*.local.xcconfig
