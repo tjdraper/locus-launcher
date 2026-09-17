@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Xcode user-specific data (window positions, breakpoints, etc.)
+xcuserdata/
+
+# Xcode build output
+DerivedData/
+
+# Swift Package Manager dependencies (re-downloaded on build)
+.build/
+.swiftpm/
