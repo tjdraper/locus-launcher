@@ -8,19 +8,33 @@
 
 /* Begin PBXBuildFile section */
 		32159191305C3F46009DC298 /* Locus Launcher.icon in Resources */ = {isa = PBXBuildFile; fileRef = 32159190305C3F46009DC298 /* Locus Launcher.icon */; };
+		32159202305C3F46009DC298 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 32159201305C3F46009DC298 /* Sparkle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		32159190305C3F46009DC298 /* Locus Launcher.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "Locus Launcher.icon"; sourceTree = "<group>"; };
+		3215917C305C3F44009DC298 /* Locus Launcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Locus Launcher.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3215918A305C3F46009DC298 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		3215918B305C3F46009DC298 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3215918C305C3F46009DC298 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
-		3215917C305C3F44009DC298 /* Locus Launcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Locus Launcher.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		32159190305C3F46009DC298 /* Locus Launcher.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "Locus Launcher.icon"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		32159203305C3F46009DC298 /* Exceptions for "LocusLauncher" folder in "Locus Launcher" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				SupportingFiles/Info.plist,
+			);
+			target = 3215917B305C3F44009DC298 /* Locus Launcher */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3215917E305C3F44009DC298 /* LocusLauncher */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				32159203305C3F46009DC298 /* Exceptions for "LocusLauncher" folder in "Locus Launcher" target */,
+			);
 			path = LocusLauncher;
 			sourceTree = "<group>";
 		};
@@ -30,6 +44,7 @@
 		32159179305C3F44009DC298 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				32159202305C3F46009DC298 /* Sparkle in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -75,6 +90,9 @@
 				3215917E305C3F44009DC298 /* LocusLauncher */,
 			);
 			name = "Locus Launcher";
+			packageProductDependencies = (
+				32159201305C3F46009DC298 /* Sparkle */,
+			);
 			productName = "Locus Launcher";
 			productReference = 3215917C305C3F44009DC298 /* Locus Launcher.app */;
 			productType = "com.apple.product-type.application";
@@ -105,6 +123,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				3215918D305C3F46009DC298 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				32159200305C3F46009DC298 /* XCRemoteSwiftPackageReference "Sparkle" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3215917D305C3F44009DC298 /* Products */;
@@ -273,6 +292,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LocusLauncher/SupportingFiles/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 TJ Draper. MIT License.";
@@ -304,6 +324,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LocusLauncher/SupportingFiles/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 TJ Draper. MIT License.";
@@ -353,6 +374,14 @@
 				version = 0.63.2;
 			};
 		};
+		32159200305C3F46009DC298 /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = exactVersion;
+				version = 2.10.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -360,6 +389,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3215918D305C3F46009DC298 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		32159201305C3F46009DC298 /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 32159200305C3F46009DC298 /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

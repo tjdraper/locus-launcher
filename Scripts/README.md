@@ -1,0 +1,50 @@
+# Releasing
+
+```
+Scripts/release.sh 1.0.1
+```
+
+The script bumps the version, archives, exports a Developer ID build, notarizes it, staples the ticket, re-zips the stapled app, and adds the release to `docs/appcast.xml`. It does not publish: it prints the `gh release create` and `git` commands to run, in the order that keeps the download live before the feed points at it.
+
+Release notes are optional. Put them in `Releases/<version>.md` and the script links them from the appcast and copies them into `docs/` so Sparkle can fetch them.
+
+If a release fails partway, undo the version bump with `git checkout -- "Locus Launcher.xcodeproj/project.pbxproj"`.
+
+## One-time setup
+
+### Developer ID Application certificate
+
+Xcode → Settings → Accounts → your Apple ID → Manage Certificates → **+** → Developer ID Application. Only the account holder can create one.
+
+### Notarization credentials
+
+Create an App Store Connect API key (App Store Connect → Users and Access → Integrations → Team Keys) with the Developer role, download the `.p8`, then:
+
+```
+xcrun notarytool store-credentials "LocusLauncher" \
+  --key ~/Downloads/AuthKey_XXXXXXXX.p8 \
+  --key-id XXXXXXXX \
+  --issuer <issuer-uuid>
+```
+
+The name must match `LOCUS_NOTARY_PROFILE` in `release.sh`, or set that environment variable to whatever you used. The `.p8` can be deleted afterwards; the credentials live in the Keychain.
+
+### Sparkle signing key
+
+Already generated and stored in the login Keychain. Its public half is `SUPublicEDKey` in `LocusLauncher/SupportingFiles/Info.plist`.
+
+**Back the private key up somewhere safe.** Losing it means no existing install can ever be updated again — the only fix would be asking everyone to download the app by hand.
+
+```
+Scripts/sparkle-tools.sh generate_keys -x sparkle-private-key.txt
+```
+
+`sparkle-tools.sh` downloads Sparkle's command line tools into `build/tools/` if they aren't there yet, then runs the one you name. With no arguments it prints the directory holding them, which is how `release.sh` uses it.
+
+Keep the exported key file out of the repo.
+
+### GitHub Pages
+
+Repo Settings → Pages → deploy from branch `main`, folder `/docs`. That serves the appcast at `https://tjdraper.github.io/locus-launcher/appcast.xml`, which is the `SUFeedURL` baked into every build.
+
+If the feed ever moves to a custom domain, add it to the same Pages site rather than changing `SUFeedURL`. GitHub redirects the old URL, so installs already in the wild keep updating.

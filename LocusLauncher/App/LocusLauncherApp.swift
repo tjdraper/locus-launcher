@@ -6,7 +6,10 @@ struct LocusLauncherApp: App {
 
     var body: some Scene {
         MenuBarExtra("Locus Launcher", systemImage: "square.grid.2x2") {
-            MenuBarMenu(launcherPanel: appDelegate.launcherPanel)
+            MenuBarMenu(
+                launcherPanel: appDelegate.launcherPanel,
+                updates: appDelegate.updates
+            )
         }
     }
 }
