@@ -63,7 +63,7 @@ git rev-parse --verify --quiet "refs/tags/v$VERSION" >/dev/null \
     || fail "$BRANCH is behind $UPSTREAM; pull before releasing"
 
 [[ -f "$RELEASE_NOTES" ]] \
-    || echo "note: no Releases/$VERSION.md, so this release ships without release notes" >&2
+    || fail "write Releases/$VERSION.md first; every release ships with notes"
 
 security find-identity -v -p codesigning | grep -q "Developer ID Application" \
     || fail "no Developer ID Application certificate in the keychain (see Scripts/README.md)"
@@ -148,9 +148,7 @@ ditto -c -k --keepParent "$EXPORTED_APP" "$ZIP"
 
 step "Updating the appcast"
 cp "$APPCAST" "$STAGE_DIR/appcast.xml"
-if [[ -f "$RELEASE_NOTES" ]]; then
-    cp "$RELEASE_NOTES" "$STAGE_DIR/$ARTIFACT_NAME-$VERSION.md"
-fi
+cp "$RELEASE_NOTES" "$STAGE_DIR/$ARTIFACT_NAME-$VERSION.md"
 
 "$SPARKLE_BIN/generate_appcast" \
     --download-url-prefix "https://github.com/$GITHUB_REPO/releases/download/v$VERSION/" \
@@ -161,9 +159,7 @@ fi
 cp "$STAGE_DIR/appcast.xml" "$APPCAST"
 
 # Sparkle links release notes relative to the feed URL, so they have to ship alongside it.
-if [[ -f "$RELEASE_NOTES" ]]; then
-    cp "$RELEASE_NOTES" "$REPO_ROOT/docs/$ARTIFACT_NAME-$VERSION.md"
-fi
+cp "$RELEASE_NOTES" "$REPO_ROOT/docs/$ARTIFACT_NAME-$VERSION.md"
 
 # --- Next steps ------------------------------------------------------------
 
@@ -180,7 +176,7 @@ the feed points at it:
   git add "$PBXPROJ" docs && git commit -m "Release $VERSION"
   git tag v$VERSION
   git push origin v$VERSION
-  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION" --verify-tag$( [[ -f "$RELEASE_NOTES" ]] && echo " --notes-file Releases/$VERSION.md" )
+  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION" --verify-tag --notes-file Releases/$VERSION.md
   git push
 
 If you stop here, undo the version bump and the appcast entry with:
