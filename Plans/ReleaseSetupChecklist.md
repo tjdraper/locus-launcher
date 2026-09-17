@@ -50,5 +50,5 @@ The key is already generated and in your login Keychain. Its public half is in `
 
 ## Not set up on purpose
 
-- **Release notes** are required. Put them in `Releases/<version>.md` before running the script. They become the Sparkle update description, the file served from `docs/`, and the GitHub release body.
+- **Release notes** are required. Write `docs/LocusLauncher-<version>.md` before running the script. That one file becomes the Sparkle update description and the GitHub release body.
 - **Publishing** is not automated. The script stops with the artifacts built and prints the `gh release create` and `git` commands, so nothing goes public without you running it.

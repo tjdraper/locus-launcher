@@ -8,7 +8,7 @@ The script bumps the version, archives, exports a Developer ID build, notarizes 
 
 `CFBundleVersion` is set to the same value as the marketing version, so there is only one number to track. Sparkle compares `CFBundleVersion`, which means a version that has shipped can never be rebuilt under the same name — ship a new version instead. The script refuses a version you have already tagged.
 
-Release notes are required. Write `Releases/<version>.md` before running the script, which refuses to build without it. Sparkle renders Markdown, so headings, lists, code blocks and tables work. The file is linked from the appcast, copied into `docs/` so Sparkle can fetch it, and passed to `gh release create` as the GitHub release description.
+Release notes are required. If `docs/LocusLauncher-<version>.md` is missing, the script checks everything else first, then creates the empty file and stops so you can write them. A blank or whitespace-only file fails the next run. Sparkle renders Markdown, so headings, lists, code blocks and tables work. Notes live in `docs/` because that is where Sparkle fetches them from, alongside the appcast; keeping an authoring copy elsewhere would only be the same file twice. The script links the file from the appcast and passes it to `gh release create` as the GitHub release description. It does not need committing first; it goes in with the release commit.
 
 The script refuses to run unless the branch is clean, has an upstream, and is exactly in sync with it. The release tag has to land on the commit the build came from, which is impossible if there is unpushed work in the way.
 

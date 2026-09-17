@@ -37,13 +37,17 @@ readonly VERSION="${1:-}"
 [[ -n "$VERSION" ]] || fail "usage: Scripts/release.sh <version>   (for example: 1.0.1)"
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || fail "version must look like 1.0 or 1.0.1, got '$VERSION'"
 
-readonly RELEASE_NOTES="$REPO_ROOT/Releases/$VERSION.md"
+# Written by hand, and published as-is: Sparkle fetches it from the same place as the appcast.
+readonly RELEASE_NOTES="$REPO_ROOT/docs/$ARTIFACT_NAME-$VERSION.md"
+readonly RELEASE_NOTES_PATH="docs/$ARTIFACT_NAME-$VERSION.md"
 
 # --- Preflight -------------------------------------------------------------
 
 step "Checking prerequisites"
 
-[[ -z "$(git status --porcelain)" ]] || fail "working tree is dirty; commit or stash first"
+# This version's notes are allowed to be uncommitted, since they go in with the release commit.
+[[ -z "$(git status --porcelain -uall | grep -v "^?? $RELEASE_NOTES_PATH\$")" ]] \
+    || fail "working tree is dirty; commit or stash first"
 
 readonly BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 UPSTREAM="$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null)" \
@@ -62,9 +66,6 @@ git rev-parse --verify --quiet "refs/tags/v$VERSION" >/dev/null \
 [[ "$(git rev-list --count "HEAD..$UPSTREAM")" == "0" ]] \
     || fail "$BRANCH is behind $UPSTREAM; pull before releasing"
 
-[[ -f "$RELEASE_NOTES" ]] \
-    || fail "write Releases/$VERSION.md first; every release ships with notes"
-
 security find-identity -v -p codesigning | grep -q "Developer ID Application" \
     || fail "no Developer ID Application certificate in the keychain (see Scripts/README.md)"
 
@@ -77,6 +78,25 @@ readonly SPARKLE_BIN="$("$REPO_ROOT/Scripts/sparkle-tools.sh")"
 
 "$SPARKLE_BIN/generate_keys" -p >/dev/null 2>&1 \
     || fail "no Sparkle EdDSA signing key in the keychain (see Scripts/README.md)"
+
+# --- Release notes ---------------------------------------------------------
+#
+# Last, so that a run which stops here has already confirmed everything else is in order.
+
+if [[ ! -f "$RELEASE_NOTES" ]]; then
+    : > "$RELEASE_NOTES"
+    cat <<EOF
+
+Everything else is ready, but $VERSION has no release notes.
+
+Created $RELEASE_NOTES_PATH. Write them there and run this again. Sparkle renders Markdown in
+its update dialog: headings, lists, code blocks, blockquotes and tables.
+EOF
+    exit 1
+fi
+
+[[ -n "$(tr -d '[:space:]' < "$RELEASE_NOTES")" ]] \
+    || fail "$RELEASE_NOTES_PATH is empty; write the release notes before releasing"
 
 # --- Version ---------------------------------------------------------------
 
@@ -148,6 +168,7 @@ ditto -c -k --keepParent "$EXPORTED_APP" "$ZIP"
 
 step "Updating the appcast"
 cp "$APPCAST" "$STAGE_DIR/appcast.xml"
+# generate_appcast pairs notes with an archive by filename, which is why both are named alike.
 cp "$RELEASE_NOTES" "$STAGE_DIR/$ARTIFACT_NAME-$VERSION.md"
 
 "$SPARKLE_BIN/generate_appcast" \
@@ -157,9 +178,6 @@ cp "$RELEASE_NOTES" "$STAGE_DIR/$ARTIFACT_NAME-$VERSION.md"
     "$STAGE_DIR"
 
 cp "$STAGE_DIR/appcast.xml" "$APPCAST"
-
-# Sparkle links release notes relative to the feed URL, so they have to ship alongside it.
-cp "$RELEASE_NOTES" "$REPO_ROOT/docs/$ARTIFACT_NAME-$VERSION.md"
 
 # --- Next steps ------------------------------------------------------------
 
@@ -176,7 +194,7 @@ the feed points at it:
   git add "$PBXPROJ" docs && git commit -m "Release $VERSION"
   git tag v$VERSION
   git push origin v$VERSION
-  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION" --verify-tag --notes-file Releases/$VERSION.md
+  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION" --verify-tag --notes-file $RELEASE_NOTES_PATH
   git push
 
 If you stop here, undo the version bump and the appcast entry with:
