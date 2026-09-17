@@ -3,6 +3,16 @@
     <channel>
         <title>Locus Launcher</title>
         <item>
+            <title>2026.0.3</title>
+            <pubDate>Thu, 17 Sep 2026 17:40:11 -0500</pubDate>
+            <link>https://github.com/tjdraper/locus-launcher</link>
+            <sparkle:version>2026.0.3</sparkle:version>
+            <sparkle:shortVersionString>2026.0.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://tjdraper.github.io/locus-launcher/LocusLauncher-2026.0.3.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.0.3/LocusLauncher-2026.0.3.zip" length="2540139" type="application/octet-stream" sparkle:edSignature="T92zH9ym6EAdYUvUaOnPOvMVNh3xillnwcmVX188JyK99l2TVYJpGaNpG9xkHVKegddgvNQgLDKv+E2bW2i5DA=="/>
+        </item>
+        <item>
             <title>2026.0.2</title>
             <pubDate>Thu, 17 Sep 2026 16:24:15 -0500</pubDate>
             <link>https://github.com/tjdraper/locus-launcher</link>
