@@ -72,9 +72,11 @@ final class AppIconCache {
         }
     }
 
+    /// Some system apps, such as Safari, are symlinks into `/System/Cryptexes`, and the icon of a
+    /// symlink carries an alias arrow.
     @concurrent
     private nonisolated static func renderIcon(at url: URL) async -> CGImage? {
-        render(NSWorkspace.shared.icon(forFile: url.path))
+        render(NSWorkspace.shared.icon(forFile: url.resolvingSymlinksInPath().path))
     }
 
     // Always 2x: Retina is the common case, and a 1x screen scales it down by exactly half.
