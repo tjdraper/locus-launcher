@@ -39,6 +39,7 @@
 				AppSearch/AppSearchIndex.swift,
 				AppSearch/FuzzyMatcher.swift,
 				AppSearch/LaunchHistory.swift,
+				SpotlightShortcut/SpotlightHotKeys.swift,
 			);
 			target = 32159301305C3F46009DC298 /* Locus Launcher Tests */;
 		};

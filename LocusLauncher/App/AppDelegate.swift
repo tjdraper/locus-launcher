@@ -2,11 +2,16 @@ import AppKit
 import KeyboardShortcuts
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let settings = SettingsWindowPresenter()
+    let updates = UpdateController()
+    lazy var settings = SettingsWindowPresenter(updates: updates)
     let appIndex = AppIndexStore()
     let appIcons = AppIconCache()
-    lazy var launcherPanel = LauncherPanelPresenter(settings: settings, appIndex: appIndex, appIcons: appIcons)
-    let updates = UpdateController()
+    lazy var launcherPanel = LauncherPanelPresenter(
+        settings: settings,
+        updates: updates,
+        appIndex: appIndex,
+        appIcons: appIcons
+    )
 
     func applicationDidFinishLaunching(_: Notification) {
         // A move relaunches the app, so nothing below should start before the offer is settled.
@@ -16,6 +21,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appIcons.start(observing: appIndex)
         KeyboardShortcuts.onKeyDown(for: .toggleLauncher) { [weak self] in
             self?.launcherPanel.toggle()
+        }
+        Task {
+            await SpotlightConflictLaunchCheck().run()
         }
     }
 

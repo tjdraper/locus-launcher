@@ -1,9 +1,6 @@
 import Foundation
 
 /// Whether this Mac also receives beta releases.
-///
-/// There is no UI for this yet. Turn it on with:
-/// `defaults write com.buzzingpixel.LocusLauncher ReceiveBetaUpdates -bool YES`
 nonisolated struct UpdateChannelPreference {
     static let betaChannel = "beta"
 

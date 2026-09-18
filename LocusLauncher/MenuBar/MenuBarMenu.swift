@@ -17,6 +17,12 @@ struct MenuBarMenu: View {
 
         Divider()
 
+        if let version = updates.waitingUpdateVersion {
+            Button("Install Update \(version)…") {
+                updates.checkForUpdates()
+            }
+        }
+
         Button("Check for Updates…") {
             updates.checkForUpdates()
         }

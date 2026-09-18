@@ -4,6 +4,8 @@ struct LauncherPanelView: View {
     let appIndex: AppIndexStore
     @Bindable var search: AppSearchSession
     let browse: AppBrowseTableController
+    let updates: UpdateController
+    let onShowUpdate: () -> Void
 
     @FocusState private var isSearchFocused: Bool
 
@@ -17,6 +19,11 @@ struct LauncherPanelView: View {
                     .textFieldStyle(.plain)
                     .font(.title)
                     .focused($isSearchFocused)
+                if let version = updates.waitingUpdateVersion {
+                    Button("Update", systemImage: "arrow.down.circle", action: onShowUpdate)
+                        .buttonStyle(.glass)
+                        .help("Locus Launcher \(version) is ready to install")
+                }
             }
             .padding(20)
 
@@ -52,7 +59,10 @@ struct LauncherPanelView: View {
         search: AppSearchSession(history: LaunchHistory()),
         browse: AppBrowseTableController(icons: AppIconCache()) { _ in
             // Previews don't launch apps.
-        }
-    )
+        },
+        updates: UpdateController()
+    ) {
+        // Previews don't install updates.
+    }
         .frame(width: LauncherPanel.size.width, height: LauncherPanel.size.height)
 }

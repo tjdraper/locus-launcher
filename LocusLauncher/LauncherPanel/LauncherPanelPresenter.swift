@@ -5,6 +5,7 @@ final class LauncherPanelPresenter {
     private static let sessionGracePeriod: Duration = .seconds(10)
 
     private let settings: SettingsWindowPresenter
+    private let updates: UpdateController
     private let appIndex: AppIndexStore
     private let appIcons: AppIconCache
     private let launchHistory = LaunchHistoryStore()
@@ -24,8 +25,9 @@ final class LauncherPanelPresenter {
     private var search: AppSearchSession?
     private var sessionEnd: Task<Void, Never>?
 
-    init(settings: SettingsWindowPresenter, appIndex: AppIndexStore, appIcons: AppIconCache) {
+    init(settings: SettingsWindowPresenter, updates: UpdateController, appIndex: AppIndexStore, appIcons: AppIconCache) {
         self.settings = settings
+        self.updates = updates
         self.appIndex = appIndex
         self.appIcons = appIcons
     }
@@ -71,7 +73,12 @@ final class LauncherPanelPresenter {
         let search = AppSearchSession(history: launchHistory.history)
         self.browse = browse
         self.search = search
-        panel.setRootView(LauncherPanelView(appIndex: appIndex, search: search, browse: browse))
+        panel.setRootView(
+            LauncherPanelView(appIndex: appIndex, search: search, browse: browse, updates: updates) { [weak self] in
+                self?.dismiss()
+                self?.updates.checkForUpdates()
+            }
+        )
     }
 
     private func endSession() {

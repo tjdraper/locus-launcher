@@ -6,21 +6,50 @@ import SwiftUI
 @Observable
 final class UpdateController {
     private let channelSelector: UpdateChannelSelector
-    private let menuBarFocus: MenuBarUpdateFocus
+    private let reminder: UpdateReminder
     private let updaterController: SPUStandardUpdaterController
     private var readinessObservation: NSKeyValueObservation?
 
     private(set) var canCheckForUpdates = false
 
+    /// The version of an update a scheduled check found, until the user looks at it or it's dismissed.
+    var waitingUpdateVersion: String? {
+        reminder.waitingVersion
+    }
+
+    var automaticallyChecksForUpdates: Bool {
+        get {
+            access(keyPath: \.automaticallyChecksForUpdates)
+            return updaterController.updater.automaticallyChecksForUpdates
+        }
+        set {
+            withMutation(keyPath: \.automaticallyChecksForUpdates) {
+                updaterController.updater.automaticallyChecksForUpdates = newValue
+            }
+        }
+    }
+
+    var receivesBetaUpdates: Bool {
+        get {
+            access(keyPath: \.receivesBetaUpdates)
+            return UpdateChannelPreference().receivesBetaUpdates
+        }
+        set {
+            withMutation(keyPath: \.receivesBetaUpdates) {
+                UpdateChannelPreference().receivesBetaUpdates = newValue
+            }
+        }
+    }
+
     init() {
-        let focus = MenuBarUpdateFocus()
+        let reminder = UpdateReminder()
         let channels = UpdateChannelSelector()
-        menuBarFocus = focus
+        self.reminder = reminder
         channelSelector = channels
         updaterController = SPUStandardUpdaterController(
             startingUpdater: false,
             updaterDelegate: channels,
-            userDriverDelegate: focus
+            userDriverDelegate: reminder
         )
         readinessObservation = updaterController.updater.observe(
             \.canCheckForUpdates,
@@ -37,7 +66,10 @@ final class UpdateController {
         updaterController.startUpdater()
     }
 
+    /// Also brings a waiting update's window forward. Sparkle doesn't announce that, so the app
+    /// comes to the front first.
     func checkForUpdates() {
+        AppActivation.bringToFront()
         updaterController.checkForUpdates(nil)
     }
 }
@@ -47,28 +79,5 @@ final class UpdateController {
 private final class UpdateChannelSelector: NSObject, SPUUpdaterDelegate {
     nonisolated func allowedChannels(for _: SPUUpdater) -> Set<String> {
         UpdateChannelPreference().allowedChannels
-    }
-}
-
-/// Without a Dock icon there is nothing to bring the app forward, so Sparkle's windows would
-/// open behind whatever the user is working in.
-private final class MenuBarUpdateFocus: NSObject, SPUStandardUserDriverDelegate {
-    nonisolated func standardUserDriverWillShowModalAlert() {
-        activate()
-    }
-
-    nonisolated func standardUserDriverWillHandleShowingUpdate(
-        _: Bool,
-        forUpdate _: SUAppcastItem,
-        state _: SPUUserUpdateState
-    ) {
-        activate()
-    }
-
-    // Sparkle calls its user driver delegate on the main thread.
-    private nonisolated func activate() {
-        MainActor.assumeIsolated {
-            NSApp.activate()
-        }
     }
 }
