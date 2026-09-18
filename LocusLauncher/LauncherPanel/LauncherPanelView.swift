@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct LauncherPanelView: View {
+    let appIndex: AppIndexStore
+
     @State private var query = ""
     @FocusState private var isSearchFocused: Bool
 
@@ -19,7 +21,7 @@ struct LauncherPanelView: View {
 
             Divider()
 
-            Spacer()
+            LauncherAppList(apps: appIndex.apps)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .glassEffect(.regular, in: .rect(cornerRadius: LauncherPanel.cornerRadius))
@@ -33,6 +35,6 @@ struct LauncherPanelView: View {
 }
 
 #Preview {
-    LauncherPanelView()
+    LauncherPanelView(appIndex: AppIndexStore())
         .frame(width: LauncherPanel.size.width, height: LauncherPanel.size.height)
 }

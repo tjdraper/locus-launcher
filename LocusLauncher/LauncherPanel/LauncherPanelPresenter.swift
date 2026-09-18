@@ -2,6 +2,7 @@ import AppKit
 
 final class LauncherPanelPresenter {
     private let settings: SettingsWindowPresenter
+    private let appIndex: AppIndexStore
     private lazy var panel = LauncherPanel(
         onDismiss: { [weak self] in
             self?.dismiss()
@@ -12,8 +13,9 @@ final class LauncherPanelPresenter {
         }
     )
 
-    init(settings: SettingsWindowPresenter) {
+    init(settings: SettingsWindowPresenter, appIndex: AppIndexStore) {
         self.settings = settings
+        self.appIndex = appIndex
     }
 
     func toggle() {
@@ -27,7 +29,7 @@ final class LauncherPanelPresenter {
     func show() {
         guard !panel.isVisible else { return }
 
-        panel.setRootView(LauncherPanelView())
+        panel.setRootView(LauncherPanelView(appIndex: appIndex))
         if let frame = LauncherPanelPlacement(size: LauncherPanel.size).frame() {
             panel.setFrame(frame, display: false)
         } else {

@@ -14,6 +14,7 @@
 
 /* Begin PBXFileReference section */
 		3215917C305C3F44009DC298 /* Locus Launcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Locus Launcher.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		32159300305C3F46009DC298 /* Locus Launcher Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Locus Launcher Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3215918A305C3F46009DC298 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		3215918B305C3F46009DC298 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3215918C305C3F46009DC298 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
@@ -28,6 +29,15 @@
 			);
 			target = 3215917B305C3F44009DC298 /* Locus Launcher */;
 		};
+		32159303305C3F46009DC298 /* Exceptions for "LocusLauncher" folder in "Locus Launcher Tests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppIndex/AppLocationPolicy.swift,
+				AppIndex/DuplicateAppResolver.swift,
+				AppIndex/IndexedApp.swift,
+			);
+			target = 32159301305C3F46009DC298 /* Locus Launcher Tests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -35,8 +45,14 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				32159203305C3F46009DC298 /* Exceptions for "LocusLauncher" folder in "Locus Launcher" target */,
+				32159303305C3F46009DC298 /* Exceptions for "LocusLauncher" folder in "Locus Launcher Tests" target */,
 			);
 			path = LocusLauncher;
+			sourceTree = "<group>";
+		};
+		32159302305C3F46009DC298 /* LocusLauncherTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LocusLauncherTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -49,6 +65,11 @@
 				32159204305C3F46009DC298 /* KeyboardShortcuts in Frameworks */,
 			);
 		};
+		32159305305C3F46009DC298 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -56,6 +77,7 @@
 			isa = PBXGroup;
 			children = (
 				3215917E305C3F44009DC298 /* LocusLauncher */,
+				32159302305C3F46009DC298 /* LocusLauncherTests */,
 				3215917D305C3F44009DC298 /* Products */,
 				32159190305C3F46009DC298 /* Locus Launcher.icon */,
 				3215918A305C3F46009DC298 /* .swiftlint.yml */,
@@ -68,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				3215917C305C3F44009DC298 /* Locus Launcher.app */,
+				32159300305C3F46009DC298 /* Locus Launcher Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -100,6 +123,27 @@
 			productReference = 3215917C305C3F44009DC298 /* Locus Launcher.app */;
 			productType = "com.apple.product-type.application";
 		};
+		32159301305C3F46009DC298 /* Locus Launcher Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32159307305C3F46009DC298 /* Build configuration list for PBXNativeTarget "Locus Launcher Tests" */;
+			buildPhases = (
+				32159304305C3F46009DC298 /* Sources */,
+				32159305305C3F46009DC298 /* Frameworks */,
+				32159306305C3F46009DC298 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3215930A305C3F46009DC298 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				32159302305C3F46009DC298 /* LocusLauncherTests */,
+			);
+			name = "Locus Launcher Tests";
+			productName = "Locus Launcher Tests";
+			productReference = 32159300305C3F46009DC298 /* Locus Launcher Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -111,6 +155,9 @@
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
 					3215917B305C3F44009DC298 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					32159301305C3F46009DC298 = {
 						CreatedOnToolsVersion = 27.0;
 					};
 				};
@@ -135,6 +182,7 @@
 			projectRoot = "";
 			targets = (
 				3215917B305C3F44009DC298 /* Locus Launcher */,
+				32159301305C3F46009DC298 /* Locus Launcher Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -146,10 +194,20 @@
 				32159191305C3F46009DC298 /* Locus Launcher.icon in Resources */,
 			);
 		};
+		32159306305C3F46009DC298 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		32159178305C3F44009DC298 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		32159304305C3F46009DC298 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
@@ -160,6 +218,10 @@
 		3215918F305C3F46009DC298 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 3215918E305C3F46009DC298 /* SwiftLintBuildToolPlugin */;
+		};
+		3215930A305C3F46009DC298 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 3215930B305C3F46009DC298 /* SwiftLintBuildToolPlugin */;
 		};
 /* End PBXTargetDependency section */
 
@@ -348,6 +410,42 @@
 			};
 			name = Release;
 		};
+		32159308305C3F46009DC298 /* Debug configuration for PBXNativeTarget "Locus Launcher Tests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQZ49H6WAK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.buzzingpixel.LocusLauncherTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		32159309305C3F46009DC298 /* Release configuration for PBXNativeTarget "Locus Launcher Tests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQZ49H6WAK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.buzzingpixel.LocusLauncherTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -364,6 +462,14 @@
 			buildConfigurations = (
 				32159188305C3F45009DC298 /* Debug configuration for PBXNativeTarget "Locus Launcher" */,
 				32159189305C3F45009DC298 /* Release configuration for PBXNativeTarget "Locus Launcher" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		32159307305C3F46009DC298 /* Build configuration list for PBXNativeTarget "Locus Launcher Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32159308305C3F46009DC298 /* Debug configuration for PBXNativeTarget "Locus Launcher Tests" */,
+				32159309305C3F46009DC298 /* Release configuration for PBXNativeTarget "Locus Launcher Tests" */,
 			);
 			defaultConfigurationName = Release;
 		};
@@ -411,6 +517,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 32159205305C3F46009DC298 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
 			productName = KeyboardShortcuts;
+		};
+		3215930B305C3F46009DC298 /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3215918D305C3F46009DC298 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

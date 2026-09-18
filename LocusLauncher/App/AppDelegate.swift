@@ -3,13 +3,15 @@ import KeyboardShortcuts
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let settings = SettingsWindowPresenter()
-    lazy var launcherPanel = LauncherPanelPresenter(settings: settings)
+    let appIndex = AppIndexStore()
+    lazy var launcherPanel = LauncherPanelPresenter(settings: settings, appIndex: appIndex)
     let updates = UpdateController()
 
     func applicationDidFinishLaunching(_: Notification) {
         // A move relaunches the app, so nothing below should start before the offer is settled.
         ApplicationsFolderMoveWorkflow().offerIfNeeded()
         updates.start()
+        appIndex.start()
         KeyboardShortcuts.onKeyDown(for: .toggleLauncher) { [weak self] in
             self?.launcherPanel.toggle()
         }
