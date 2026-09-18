@@ -99,14 +99,17 @@ if [[ ! -f "$RELEASE_NOTES" ]]; then
 
 Everything else is ready, but $VERSION has no release notes.
 
-Created $RELEASE_NOTES_PATH. Write them there and run this again. Sparkle renders Markdown in
+Created the notes file below. Write them there and run this again. Sparkle renders Markdown in
 its update dialog: headings, lists, code blocks, blockquotes and tables.
+
+$RELEASE_NOTES
+
 EOF
     exit 1
 fi
 
 [[ -n "$(tr -d '[:space:]' < "$RELEASE_NOTES")" ]] \
-    || fail "$RELEASE_NOTES_PATH is empty; write the release notes before releasing"
+    || fail "the release notes are empty; write them before releasing: $RELEASE_NOTES"
 
 # --- Version ---------------------------------------------------------------
 
