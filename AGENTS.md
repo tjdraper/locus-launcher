@@ -105,6 +105,14 @@ The Xcode `BuildProject` MCP tool builds whichever scheme and destination Xcode 
 
 Check the build log at warning severity and fix any warnings (including SwiftLint violations) before declaring work done.
 
+## Tests
+
+`Locus Launcher Tests` does not run inside the app, because a hosted test run would launch it, register the global hotkey and start Sparkle. It compiles only the app files it tests. To put another app file under test, add it to the "Locus Launcher Tests" target membership (the membership exception set on the `LocusLauncher` folder in `project.pbxproj`). Only pure, `nonisolated` code with no dependencies on the rest of the app belongs there.
+
+Run the tests with:
+
+- `xcodebuild -project "Locus Launcher.xcodeproj" -scheme "Locus Launcher" -destination "platform=macOS" test`
+
 ## Swift 6 Concurrency
 
 The project uses Swift 6 with `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor`. App code is main-actor-isolated by default; opt out only when needed.
