@@ -62,6 +62,7 @@
     - Choose the launcher hotkey, and turn off Spotlight's shortcut if Cmd+Space is chosen
     - Grant Accessibility permission, with an explanation of what it enables (opening new windows) and a way to skip it
     - Launch at login
+    - Ask about automatic update checks here. Sparkle otherwise raises its own permission prompt on the second launch, which for a menu bar app that starts at login lands at an arbitrary moment. Take it over with `SPUUpdaterDelegate.updaterShouldPromptForPermissionToCheckForUpdates`.
     - Each step reflects the real current state, so granting a permission in System Settings updates the wizard
 
 11. **Polish and first release**
