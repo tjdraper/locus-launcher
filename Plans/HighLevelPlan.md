@@ -47,17 +47,32 @@
    - Beta updates toggle. Sparkle's channel filter already reads the `ReceiveBetaUpdates` default (slice 2), so this is a checkbox bound to that key, with a line explaining that betas ship more often and may break.
    - Sparkle gentle reminders (https://sparkle-project.org/documentation/gentle-reminders). Today a scheduled check that finds an update brings Sparkle's window to the front at any moment. Instead, show a quiet sign that an update is ready and open the window when the user clicks it. The menu bar icon can be hidden, so the sign can't live only there; a notification or a line in the launcher panel covers that case. Sparkle logs a warning at launch until this is done.
 
-8. **Per-app shortcuts**
-   - Assign a shortcut to an app
-   - Choose between activating the app and opening a new window
+8. **Actions menu and hidden apps**
+   - The selected row shows a caret at its trailing edge. Tab, or clicking the caret's area, opens an actions menu for that app. Clicking anywhere else on the row still opens the app. Tab is used because every arrow-key combination already moves the search field's cursor or switches Spaces.
+   - While the menu is open, Up and Down arrows move through it and Enter runs the highlighted item. Esc closes only the menu, and the panel stays open.
+   - Each menu item shows its keyboard shortcut, and the shortcut works from the panel without opening the menu:
+     - Open (Enter)
+     - New Window (Cmd+Option+Enter)
+     - Reveal in Finder (Cmd+Enter)
+     - Hide from Launcher (Cmd+Option+Delete)
+   - New Window activates the app and sends Cmd+N, so it needs Accessibility permission (see Decisions). Without it, New Window only activates the app. Slice 9 reuses this for "open new window" shortcuts.
+   - Hidden apps drop out of both browse and search
+   - Each hidden app has a "Sync to other Macs" choice, on by default and stored per app so slice 10 can sync it. Hiding happens right away with no prompt, since a prompt would slow down a one-keystroke action. The choice is changed in the Hidden Apps window.
+   - A Hidden Apps window lists hidden apps, can unhide them, and can change each one's sync choice. It opens from the menu bar menu, or with Cmd+Option+Control+H while the panel has focus. Cmd+Option+H is left alone because it's the system's Hide Others shortcut.
+
+9. **Per-app shortcuts**
+   - Assign shortcuts to an app from the actions menu: "Manage Hot Keys" (Cmd+K)
+   - An app can have any number of shortcuts, and each one either activates the app or opens a new window. That gives an app a shortcut for each action.
    - Detect conflicting shortcuts
+   - Show an app's assigned shortcuts in its launcher row
 
-9. **iCloud sync**
-   - Shortcut settings sync through iCloud key-value storage
-   - Each shortcut is either synced or local to this Mac
-   - Handle a synced shortcut for an app that isn't installed on the other Mac
+10. **iCloud sync**
+    - Shortcut settings sync through iCloud key-value storage
+    - Each shortcut is either synced or local to this Mac
+    - Hidden apps marked for sync (slice 8) sync the same way
+    - Handle a synced shortcut for an app that isn't installed on the other Mac
 
-10. **First-run wizard**
+11. **First-run wizard**
     - Step-by-step setup shown on first launch, and reopenable later
     - Move to `/Applications` if needed
     - Choose the launcher hotkey, and turn off Spotlight's shortcut if Cmd+Space is chosen
@@ -66,14 +81,14 @@
     - Ask about automatic update checks here. Sparkle otherwise raises its own permission prompt on the second launch, which for a menu bar app that starts at login lands at an arbitrary moment. Take it over with `SPUUpdaterDelegate.updaterShouldPromptForPermissionToCheckForUpdates`.
     - Each step reflects the real current state, so granting a permission in System Settings updates the wizard
 
-11. **Polish and first release**
+12. **Polish and first release**
     - App icon, website download, v1
     - Custom menu bar icon to replace the `square.grid.2x2` SF Symbol. It has to keep working with the red update badge, which `MenuBarIcon` draws into the image.
 
 ## Decisions
 
 - **Cmd+Space:** macOS gives it to Spotlight. The app offers a button that turns off Spotlight's shortcut by editing `com.apple.symbolichotkeys.plist` (entries 64 and 65) and applying the change without a logout. This is undocumented, so it needs testing on each macOS release, and it falls back to opening the right System Settings page. When the app changed the setting, Settings offers to turn it back on, which matters most after the user picks a different launcher hotkey. Quitting leaves it off, since the app can't tell a normal quit from an uninstall.
-- **Accessibility permission:** opening a new window means activating the app and sending it Cmd+N, which needs Accessibility access. The wizard asks for it but the user can skip. Without it, "open new window" shortcuts only activate the app, and Settings says so next to that option with a way to grant access. Apps that ignore Cmd+N also fall back to activating.
+- **Accessibility permission:** opening a new window means activating the app and sending it Cmd+N, which needs Accessibility access. The wizard asks for it but the user can skip. Without it, New Window in the actions menu and "open new window" shortcuts only activate the app, and Settings says so next to that option with a way to grant access. Apps that ignore Cmd+N also fall back to activating.
 - **No App Sandbox:** sending keystrokes to other apps and editing Spotlight's shortcut don't work in the sandbox. Signing and notarization still work. App Store distribution isn't a goal.
 - **Updates:** Sparkle, with release zips on GitHub Releases and the appcast served from GitHub Pages at `https://tjdraper.github.io/locus-launcher/appcast.xml`. Betas ride the same feed on a Sparkle channel.
 - **Distribution:** a notarized, stapled `.app` in a zip, not a DMG.
@@ -83,7 +98,7 @@
 - **Settings window:** a plain AppKit window hosting a SwiftUI view, not SwiftUI's `Settings` scene, which can only be opened from inside a SwiftUI view. The app shows a Dock icon while Settings is open so the window is reachable with Cmd+Tab.
 - **Menu bar icon:** no hide option in the app. macOS's own "Allow in the Menu Bar" setting covers that. With the icon hidden, Settings is still reachable with Cmd+, in the launcher, or by opening Locus Launcher again (from the launcher or Finder) while it's running.
 - **License:** MIT.
-- **Onboarding:** a first-run wizard (slice 10) covers every setup step, including permissions.
+- **Onboarding:** a first-run wizard (slice 11) covers every setup step, including permissions.
 
 ## Future versions
 
@@ -93,7 +108,7 @@
   - Apple has no public API for this. The settings live in a protected system folder (`~/Library/Group Containers/com.apple.MenuBar`) that other apps can't read. The fallback is driving the System Settings switch through Accessibility, which is fragile.
   - Option+Space is also ChatGPT's default shortcut and types a non-breaking space, so conflicts need flagging
 
-- **Actions beyond open:** extra actions on a result, such as reveal in Finder or quit a running app. Not in v1.
+- **More result actions:** quit a running app, and other actions beyond slice 8's menu. Not in v1.
 
 ## Public repo
 
