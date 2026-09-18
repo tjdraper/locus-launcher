@@ -8,6 +8,7 @@ struct LocusLauncherApp: App {
         MenuBarExtra("Locus Launcher", systemImage: "square.grid.2x2") {
             MenuBarMenu(
                 launcherPanel: appDelegate.launcherPanel,
+                settings: appDelegate.settings,
                 updates: appDelegate.updates
             )
         }

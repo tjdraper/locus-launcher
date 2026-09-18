@@ -2,12 +2,18 @@ import SwiftUI
 
 struct MenuBarMenu: View {
     let launcherPanel: LauncherPanelPresenter
+    let settings: SettingsWindowPresenter
     let updates: UpdateController
 
     var body: some View {
         Button("Show Launcher") {
             launcherPanel.show()
         }
+
+        Button("Settings…") {
+            settings.show()
+        }
+        .keyboardShortcut(",")
 
         Divider()
 

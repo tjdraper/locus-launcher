@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		32159191305C3F46009DC298 /* Locus Launcher.icon in Resources */ = {isa = PBXBuildFile; fileRef = 32159190305C3F46009DC298 /* Locus Launcher.icon */; };
 		32159202305C3F46009DC298 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 32159201305C3F46009DC298 /* Sparkle */; };
+		32159204305C3F46009DC298 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 32159206305C3F46009DC298 /* KeyboardShortcuts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				32159202305C3F46009DC298 /* Sparkle in Frameworks */,
+				32159204305C3F46009DC298 /* KeyboardShortcuts in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -92,6 +94,7 @@
 			name = "Locus Launcher";
 			packageProductDependencies = (
 				32159201305C3F46009DC298 /* Sparkle */,
+				32159206305C3F46009DC298 /* KeyboardShortcuts */,
 			);
 			productName = "Locus Launcher";
 			productReference = 3215917C305C3F44009DC298 /* Locus Launcher.app */;
@@ -124,6 +127,7 @@
 			packageReferences = (
 				3215918D305C3F46009DC298 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				32159200305C3F46009DC298 /* XCRemoteSwiftPackageReference "Sparkle" */,
+				32159205305C3F46009DC298 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3215917D305C3F44009DC298 /* Products */;
@@ -382,6 +386,14 @@
 				version = 2.10.0;
 			};
 		};
+		32159205305C3F46009DC298 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = exactVersion;
+				version = 3.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -394,6 +406,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 32159200305C3F46009DC298 /* XCRemoteSwiftPackageReference "Sparkle" */;
 			productName = Sparkle;
+		};
+		32159206305C3F46009DC298 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 32159205305C3F46009DC298 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
