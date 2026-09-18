@@ -45,6 +45,7 @@
    - Shortcut recorder for the launcher hotkey (`KeyboardShortcuts.Recorder`)
    - Turn off Spotlight's Cmd+Space shortcut from the app, with a fallback link to System Settings (see Decisions)
    - Beta updates toggle. Sparkle's channel filter already reads the `ReceiveBetaUpdates` default (slice 2), so this is a checkbox bound to that key, with a line explaining that betas ship more often and may break.
+   - Sparkle gentle reminders (https://sparkle-project.org/documentation/gentle-reminders). Today a scheduled check that finds an update brings Sparkle's window to the front at any moment. Instead, show a quiet sign that an update is ready and open the window when the user clicks it. The menu bar icon can be hidden, so the sign can't live only there; a notification or a line in the launcher panel covers that case. Sparkle logs a warning at launch until this is done.
 
 8. **Per-app shortcuts**
    - Assign a shortcut to an app
