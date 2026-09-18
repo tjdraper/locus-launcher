@@ -14,11 +14,11 @@
 
 /* Begin PBXFileReference section */
 		3215917C305C3F44009DC298 /* Locus Launcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Locus Launcher.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		32159300305C3F46009DC298 /* Locus Launcher Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Locus Launcher Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3215918A305C3F46009DC298 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		3215918B305C3F46009DC298 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		3215918C305C3F46009DC298 /* AGENTS.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = AGENTS.md; sourceTree = "<group>"; };
 		32159190305C3F46009DC298 /* Locus Launcher.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = "Locus Launcher.icon"; sourceTree = "<group>"; };
+		32159300305C3F46009DC298 /* Locus Launcher Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Locus Launcher Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -32,6 +32,7 @@
 		32159303305C3F46009DC298 /* Exceptions for "LocusLauncher" folder in "Locus Launcher Tests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AppBrowsing/BrowseList.swift,
 				AppIndex/AppLocationPolicy.swift,
 				AppIndex/DuplicateAppResolver.swift,
 				AppIndex/IndexedApp.swift,

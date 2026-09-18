@@ -4,7 +4,8 @@ import KeyboardShortcuts
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let settings = SettingsWindowPresenter()
     let appIndex = AppIndexStore()
-    lazy var launcherPanel = LauncherPanelPresenter(settings: settings, appIndex: appIndex)
+    let appIcons = AppIconCache()
+    lazy var launcherPanel = LauncherPanelPresenter(settings: settings, appIndex: appIndex, appIcons: appIcons)
     let updates = UpdateController()
 
     func applicationDidFinishLaunching(_: Notification) {
@@ -12,6 +13,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ApplicationsFolderMoveWorkflow().offerIfNeeded()
         updates.start()
         appIndex.start()
+        appIcons.start(observing: appIndex)
         KeyboardShortcuts.onKeyDown(for: .toggleLauncher) { [weak self] in
             self?.launcherPanel.toggle()
         }
