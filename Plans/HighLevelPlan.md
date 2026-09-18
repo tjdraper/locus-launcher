@@ -40,9 +40,9 @@
    - Launch history per search term, which pushes recent picks to the top
 
 7. **Settings basics**
-   - Settings window
+   - Fill in the Settings window (slice 3 added a placeholder)
    - Launch at login (`SMAppService`)
-   - Shortcut recorder for the launcher hotkey
+   - Shortcut recorder for the launcher hotkey (`KeyboardShortcuts.Recorder`)
    - Turn off Spotlight's Cmd+Space shortcut from the app, with a fallback link to System Settings (see Decisions)
    - Beta updates toggle. Sparkle's channel filter already reads the `ReceiveBetaUpdates` default (slice 2), so this is a checkbox bound to that key, with a line explaining that betas ship more often and may break.
 
@@ -77,6 +77,8 @@
 - **Distribution:** a notarized, stapled `.app` in a zip, not a DMG.
 - **Launch history:** stays local to each Mac and isn't synced, since installed apps differ between Macs.
 - **Search scope:** the main launcher searches apps only. No settings search.
+- **Hotkeys:** the `KeyboardShortcuts` package (sindresorhus) registers global hotkeys through Carbon, which needs no Accessibility permission. It also provides the shortcut recorder and supports any number of named shortcuts, which per-app shortcuts need. The launcher hotkey defaults to Cmd+Space, so until Spotlight's shortcut is turned off (slice 7), turn it off by hand in System Settings to test.
+- **Settings window:** a plain AppKit window hosting a SwiftUI view, not SwiftUI's `Settings` scene, which can only be opened from inside a SwiftUI view. The app shows a Dock icon while Settings is open so the window is reachable with Cmd+Tab.
 - **Menu bar icon:** no hide option in the app. macOS's own "Allow in the Menu Bar" setting covers that. With the icon hidden, Settings is still reachable with Cmd+, in the launcher, or by opening Locus Launcher again (from the launcher or Finder) while it's running.
 - **License:** MIT.
 - **Onboarding:** a first-run wizard (slice 10) covers every setup step, including permissions.
