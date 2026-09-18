@@ -174,12 +174,12 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         case let .app(app):
             let view = tableView.makeView(withIdentifier: AppBrowseCellView.identifier, owner: nil) as? AppBrowseCellView
                 ?? AppBrowseCellView()
-            if let icon = icons.cachedIcon(for: app.url) {
+            if let icon = icons.cachedIcon(for: app) {
                 view.show(app, icon: icon)
             } else {
                 view.show(app, icon: icons.placeholder)
                 Task { [icons] in
-                    let icon = await icons.icon(for: app.url)
+                    let icon = await icons.icon(for: app)
                     if view.appURL == app.url {
                         view.imageView?.image = icon
                     }

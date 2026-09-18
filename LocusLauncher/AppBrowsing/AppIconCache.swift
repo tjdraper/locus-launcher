@@ -3,12 +3,23 @@ import Observation
 import UniformTypeIdentifiers
 
 /// App icons pre-rendered at the size the list draws them, so scrolling never asks the system for
-/// an icon or scales a full-size one.
+/// an icon or scales a full-size one. An update to an app changes its key, so its icon is drawn
+/// again.
 final class AppIconCache {
     nonisolated static let pointSize: CGFloat = 32
 
-    private var icons: [URL: NSImage] = [:]
-    private var loads: [URL: Task<NSImage, Never>] = [:]
+    private struct Key: Hashable {
+        let url: URL
+        let lastModified: Date?
+
+        init(_ app: IndexedApp) {
+            url = app.url
+            lastModified = app.lastModified
+        }
+    }
+
+    private var icons: [Key: NSImage] = [:]
+    private var loads: [Key: Task<NSImage, Never>] = [:]
     private var prewarm: Task<Void, Never>?
 
     lazy var placeholder: NSImage = Self.render(NSWorkspace.shared.icon(for: .applicationBundle)).map(Self.image)
@@ -18,44 +29,45 @@ final class AppIconCache {
     func start(observing appIndex: AppIndexStore) {
         Task { [weak self] in
             for await apps in Observations({ appIndex.apps }) {
-                self?.refresh(for: apps.map(\.url))
+                self?.refresh(for: apps)
             }
         }
     }
 
-    func cachedIcon(for url: URL) -> NSImage? {
-        icons[url]
+    func cachedIcon(for app: IndexedApp) -> NSImage? {
+        icons[Key(app)]
     }
 
-    func icon(for url: URL) async -> NSImage {
-        if let icon = icons[url] {
+    func icon(for app: IndexedApp) async -> NSImage {
+        let key = Key(app)
+        if let icon = icons[key] {
             return icon
         }
-        if let load = loads[url] {
+        if let load = loads[key] {
             return await load.value
         }
 
         let load = Task {
-            let icon = await Self.renderIcon(at: url).map(Self.image) ?? placeholder
-            icons[url] = icon
-            loads[url] = nil
+            let icon = await Self.renderIcon(at: app.url).map(Self.image) ?? placeholder
+            icons[key] = icon
+            loads[key] = nil
             return icon
         }
-        loads[url] = load
+        loads[key] = load
         return await load.value
     }
 
-    private func refresh(for urls: [URL]) {
-        let current = Set(urls)
+    private func refresh(for apps: [IndexedApp]) {
+        let current = Set(apps.map(Key.init))
         icons = icons.filter { current.contains($0.key) }
 
         prewarm?.cancel()
         prewarm = Task { [weak self] in
             // One icon at a time in list order, so the rows at the top are ready first and a large
             // index doesn't occupy every core.
-            for url in urls {
+            for app in apps {
                 guard !Task.isCancelled, let self else { return }
-                _ = await icon(for: url)
+                _ = await icon(for: app)
             }
         }
     }

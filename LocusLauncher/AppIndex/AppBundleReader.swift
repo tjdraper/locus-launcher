@@ -2,7 +2,18 @@ import Foundation
 
 nonisolated enum AppBundleReader {
     static func read(_ url: URL) -> IndexedApp {
-        IndexedApp(url: url, name: displayName(of: url), bundleIdentifier: bundleIdentifier(of: url))
+        IndexedApp(
+            url: url,
+            name: displayName(of: url),
+            bundleIdentifier: bundleIdentifier(of: url),
+            lastModified: lastModified(of: url)
+        )
+    }
+
+    private static func lastModified(of url: URL) -> Date? {
+        [url, url.appending(components: "Contents", "Info.plist")]
+            .compactMap { try? $0.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate }
+            .max()
     }
 
     /// Finder's localized name, which follows the user's language. It keeps the `.app` extension
