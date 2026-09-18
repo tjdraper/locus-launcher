@@ -4,31 +4,38 @@ import SwiftUI
 /// Shows Settings in a plain AppKit window. SwiftUI's `Settings` scene can only be opened from
 /// inside a SwiftUI view, and the launcher panel and the app reopen event both come from AppKit.
 ///
-/// The app gets a Dock icon while Settings is open, so the window shows up in Cmd+Tab and
-/// can be found again after the user switches away.
 final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
     private let updates: UpdateController
+    private let accessibilityAccess: AccessibilityAccessStore
+    private let dockIcon: DockIconPresence
     private let launchAtLogin = LaunchAtLoginStore()
     private let spotlight = SpotlightShortcutStore()
     private lazy var window = makeWindow()
 
-    init(updates: UpdateController) {
+    init(updates: UpdateController, accessibilityAccess: AccessibilityAccessStore, dockIcon: DockIconPresence) {
         self.updates = updates
+        self.accessibilityAccess = accessibilityAccess
+        self.dockIcon = dockIcon
     }
 
     func show() {
-        NSApp.setActivationPolicy(.regular)
+        dockIcon.windowWillShow(window)
         AppActivation.bringToFront()
         window.makeKeyAndOrderFront(nil)
     }
 
     func windowWillClose(_: Notification) {
-        NSApp.setActivationPolicy(.accessory)
+        dockIcon.windowWillClose(window)
     }
 
     private func makeWindow() -> NSWindow {
         let window = NSWindow(contentViewController: NSHostingController(
-            rootView: SettingsView(updates: updates, launchAtLogin: launchAtLogin, spotlight: spotlight)
+            rootView: SettingsView(
+                updates: updates,
+                launchAtLogin: launchAtLogin,
+                spotlight: spotlight,
+                accessibilityAccess: accessibilityAccess
+            )
         ))
         window.title = "Locus Launcher Settings"
         window.styleMask = [.titled, .closable]

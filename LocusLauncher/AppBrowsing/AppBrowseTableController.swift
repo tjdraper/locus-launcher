@@ -1,17 +1,19 @@
 import AppKit
 
-/// Owns the browse table: fills it from the list, keeps one app selected, and launches apps from
-/// clicks and the keyboard. It outlives the SwiftUI view, so the selection and scroll position
-/// survive while the panel is hidden.
+/// Owns the browse table: fills it from the list, keeps one app selected, and runs actions on apps
+/// from clicks, the keyboard and the actions menu. It outlives the SwiftUI view, so the selection
+/// and scroll position survive while the panel is hidden.
 final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     private let icons: AppIconCache
-    private let onLaunch: (IndexedApp) -> Void
+    private let onAction: (AppAction, IndexedApp) -> Void
     private var list = BrowseList(apps: [])
     private weak var tableView: AppBrowseTableView?
+    private var actionsMenu: AppActionsMenu?
+    private weak var actionsMenuCell: AppBrowseCellView?
 
-    init(icons: AppIconCache, onLaunch: @escaping (IndexedApp) -> Void) {
+    init(icons: AppIconCache, onAction: @escaping (AppAction, IndexedApp) -> Void) {
         self.icons = icons
-        self.onLaunch = onLaunch
+        self.onAction = onAction
     }
 
     func makeScrollView() -> NSScrollView {
@@ -31,7 +33,7 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         tableView.dataSource = self
         tableView.delegate = self
         tableView.target = self
-        tableView.action = #selector(launchClickedRow)
+        tableView.action = #selector(handleClick)
         tableView.onHoverRow = { [weak self] row in
             self?.select(row, reveal: false)
         }
@@ -47,17 +49,21 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         return scrollView
     }
 
-    /// Keeps the selected app selected while the browse list updates. Anything else, including each
-    /// new set of search results, starts from the first app.
+    /// Keeps the selected app selected while the browse list updates, and when the selected app is
+    /// hidden, moves to the app that took its place. Anything else, including each new set of
+    /// search results, starts from the first app.
     func show(_ newList: BrowseList) {
         guard newList != list, let tableView else { return }
 
-        let selectedURL = list.hasSections && newList.hasSections ? list.app(at: tableView.selectedRow)?.url : nil
+        let previous = list
+        let selected = previous.app(at: tableView.selectedRow)
         list = newList
         tableView.showsSections = list.hasSections
         tableView.reloadData()
-        if let row = selectedURL.flatMap(list.row(of:)) {
+        if previous.hasSections, list.hasSections, let row = selected.flatMap({ list.row(of: $0.url) }) {
             select(row, reveal: false)
+        } else if let row = selected.flatMap({ list.row(replacing: $0, removedFrom: previous) }) {
+            select(row, reveal: true)
         } else if let row = list.firstAppRow {
             // Scrolling to the top rather than revealing the row, because on the first fill the
             // table has no size yet and every row looks out of view.
@@ -76,9 +82,13 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         select(row, reveal: true)
     }
 
-    func launchSelection() {
-        guard let tableView, let app = list.app(at: tableView.selectedRow) else { return }
-        onLaunch(app)
+    var selectedApp: IndexedApp? {
+        tableView.flatMap { list.app(at: $0.selectedRow) }
+    }
+
+    func showActionsForSelection() {
+        guard let tableView, tableView.selectedRow >= 0 else { return }
+        showActions(forRow: tableView.selectedRow, in: tableView, highlightingFirstItem: true)
     }
 
     /// Scrolls the section to the top and selects its first app, so the keyboard carries on from
@@ -91,13 +101,70 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         }
     }
 
-    @objc private func launchClickedRow() {
-        guard let tableView, let event = NSApp.currentEvent,
-              tableView.visibleRow(atWindowLocation: event.locationInWindow) == tableView.clickedRow,
-              let app = list.app(at: tableView.clickedRow) else {
+    @objc private func handleClick() {
+        guard let tableView, let event = NSApp.currentEvent else { return }
+        let row = tableView.clickedRow
+        guard tableView.visibleRow(atWindowLocation: event.locationInWindow) == row, let app = list.app(at: row) else {
             return
         }
-        onLaunch(app)
+        let caretArea = AppBrowseRowMetrics.caretArea(inRow: tableView.rect(ofRow: row), reservesLetterIndex: list.hasSections)
+        if caretArea.contains(tableView.convert(event.locationInWindow, from: nil)) {
+            showActions(forRow: row, in: tableView, highlightingFirstItem: false)
+        } else {
+            onAction(.open, app)
+        }
+    }
+
+    private func showActions(forRow row: Int, in tableView: NSTableView, highlightingFirstItem: Bool) {
+        guard let app = list.app(at: row), let window = tableView.window else { return }
+        closeActionsMenu()
+        reveal(row, in: tableView)
+        let caretArea = AppBrowseRowMetrics.caretArea(inRow: tableView.rect(ofRow: row), reservesLetterIndex: list.hasSections)
+        let menu = AppActionsMenu(highlightingFirstItem: highlightingFirstItem) { [weak self] action in
+            self?.closeActionsMenu()
+            self?.onAction(action, app)
+        }
+        let below = window.convertPoint(toScreen: tableView.convert(NSPoint(x: caretArea.minX, y: caretArea.maxY), to: nil))
+        let above = window.convertPoint(toScreen: tableView.convert(NSPoint(x: caretArea.minX, y: caretArea.minY), to: nil))
+        menu.show(below: below, orAbove: above.y, attachedTo: window)
+        actionsMenu = menu
+        actionsMenuCell = tableView.view(atColumn: 0, row: row, makeIfNecessary: false) as? AppBrowseCellView
+        actionsMenuCell?.showActionsMenuOpen(true)
+    }
+
+    func closeActionsMenu() {
+        actionsMenu?.close()
+        actionsMenu = nil
+        actionsMenuCell?.showActionsMenuOpen(false)
+        actionsMenuCell = nil
+    }
+
+    /// Takes the panel's events while the actions menu is open, the way a menu would: the keys
+    /// work the menu, and a click elsewhere in the panel only closes it. Returns whether the event
+    /// was used up.
+    func handleEventWhileActionsMenuIsOpen(_ event: NSEvent) -> Bool {
+        guard let actionsMenu else { return false }
+        switch event.type {
+        case .keyDown:
+            switch actionsMenu.handleKeyDown(event) {
+            case .handled:
+                return true
+            case .close:
+                closeActionsMenu()
+                return true
+            case .notHandled:
+                // Typing carries on into the search field.
+                closeActionsMenu()
+                return false
+            }
+        case .leftMouseDown, .rightMouseDown, .otherMouseDown:
+            closeActionsMenu()
+            return true
+        case .mouseMoved, .scrollWheel, .leftMouseDragged, .leftMouseUp, .rightMouseUp, .otherMouseUp:
+            return true
+        default:
+            return false
+        }
     }
 
     private func select(_ row: Int, reveal: Bool) {
@@ -180,9 +247,9 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
             let view = tableView.makeView(withIdentifier: AppBrowseCellView.identifier, owner: nil) as? AppBrowseCellView
                 ?? AppBrowseCellView()
             if let icon = icons.cachedIcon(for: app) {
-                view.show(app, icon: icon)
+                view.show(app, icon: icon, reservesLetterIndex: list.hasSections)
             } else {
-                view.show(app, icon: icons.placeholder)
+                view.show(app, icon: icons.placeholder, reservesLetterIndex: list.hasSections)
                 Task { [icons] in
                     let icon = await icons.icon(for: app)
                     if view.appURL == app.url {

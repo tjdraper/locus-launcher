@@ -6,6 +6,7 @@ struct SettingsView: View {
     let updates: UpdateController
     let launchAtLogin: LaunchAtLoginStore
     let spotlight: SpotlightShortcutStore
+    let accessibilityAccess: AccessibilityAccessStore
 
     var body: some View {
         Form {
@@ -24,13 +25,17 @@ struct SettingsView: View {
                 SpotlightShortcutRows(store: spotlight)
             }
 
+            Section("Permissions") {
+                AccessibilityAccessRow(store: accessibilityAccess)
+            }
+
             UpdateSettingsSection(updates: updates)
         }
         .formStyle(.grouped)
         .frame(width: 460)
         .fixedSize()
         .task {
-            // Either setting can change in System Settings while this window is open or closed.
+            // These settings can change in System Settings while this window is open or closed.
             refresh()
             for await _ in NotificationCenter.default.notifications(named: NSApplication.didBecomeActiveNotification) {
                 refresh()
@@ -41,9 +46,15 @@ struct SettingsView: View {
     private func refresh() {
         launchAtLogin.refresh()
         spotlight.refresh()
+        accessibilityAccess.refresh()
     }
 }
 
 #Preview {
-    SettingsView(updates: UpdateController(), launchAtLogin: LaunchAtLoginStore(), spotlight: SpotlightShortcutStore())
+    SettingsView(
+        updates: UpdateController(),
+        launchAtLogin: LaunchAtLoginStore(),
+        spotlight: SpotlightShortcutStore(),
+        accessibilityAccess: AccessibilityAccessStore()
+    )
 }

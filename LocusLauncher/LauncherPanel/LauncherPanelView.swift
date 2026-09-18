@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LauncherPanelView: View {
     let appIndex: AppIndexStore
+    let hiddenApps: HiddenAppsStore
     @Bindable var search: AppSearchSession
     let browse: AppBrowseTableController
     let updates: UpdateController
@@ -49,15 +50,17 @@ struct LauncherPanelView: View {
     }
 
     private var list: BrowseList {
-        search.results(in: appIndex.apps).map(BrowseList.init(searchResults:)) ?? BrowseList(apps: appIndex.apps)
+        let apps = hiddenApps.list.visibleApps(in: appIndex.apps)
+        return search.results(in: apps).map(BrowseList.init(searchResults:)) ?? BrowseList(apps: apps)
     }
 }
 
 #Preview {
     LauncherPanelView(
         appIndex: AppIndexStore(),
+        hiddenApps: HiddenAppsStore(),
         search: AppSearchSession(history: LaunchHistory()),
-        browse: AppBrowseTableController(icons: AppIconCache()) { _ in
+        browse: AppBrowseTableController(icons: AppIconCache()) { _, _ in
             // Previews don't launch apps.
         },
         updates: UpdateController()

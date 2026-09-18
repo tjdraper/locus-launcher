@@ -3,14 +3,26 @@ import KeyboardShortcuts
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     let updates = UpdateController()
-    lazy var settings = SettingsWindowPresenter(updates: updates)
     let appIndex = AppIndexStore()
     let appIcons = AppIconCache()
+    let hiddenApps = HiddenAppsStore()
+    let accessibilityAccess = AccessibilityAccessStore()
+    let dockIcon = DockIconPresence()
+    lazy var settings = SettingsWindowPresenter(updates: updates, accessibilityAccess: accessibilityAccess, dockIcon: dockIcon)
+    lazy var hiddenAppsWindow = HiddenAppsWindowPresenter(
+        hiddenApps: hiddenApps,
+        appIndex: appIndex,
+        appIcons: appIcons,
+        dockIcon: dockIcon
+    )
     lazy var launcherPanel = LauncherPanelPresenter(
         settings: settings,
+        hiddenAppsWindow: hiddenAppsWindow,
         updates: updates,
         appIndex: appIndex,
-        appIcons: appIcons
+        appIcons: appIcons,
+        hiddenApps: hiddenApps,
+        accessibilityAccess: accessibilityAccess
     )
 
     func applicationDidFinishLaunching(_: Notification) {

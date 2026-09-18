@@ -7,7 +7,8 @@ final class LauncherPanel: NSPanel {
     enum KeyCommand {
         case moveUp
         case moveDown
-        case launch
+        case showActions
+        case perform(AppAction)
     }
 
     static let cornerRadius: CGFloat = 24
@@ -15,15 +16,22 @@ final class LauncherPanel: NSPanel {
 
     private let onDismiss: () -> Void
     private let onOpenSettings: () -> Void
+    private let onOpenHiddenApps: () -> Void
     private let onKeyCommand: (KeyCommand) -> Void
+
+    /// Sees each event first, and returns whether it used it up. The actions menu takes the
+    /// panel's events this way while it's open.
+    var interceptEvent: ((NSEvent) -> Bool)?
 
     init(
         onDismiss: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
+        onOpenHiddenApps: @escaping () -> Void,
         onKeyCommand: @escaping (KeyCommand) -> Void
     ) {
         self.onDismiss = onDismiss
         self.onOpenSettings = onOpenSettings
+        self.onOpenHiddenApps = onOpenHiddenApps
         self.onKeyCommand = onKeyCommand
         super.init(
             contentRect: NSRect(origin: .zero, size: Self.size),
@@ -60,9 +68,12 @@ final class LauncherPanel: NSPanel {
         onDismiss()
     }
 
-    // Esc and the list keys are caught here because the focused search field would otherwise
-    // consume them.
+    // Esc, the list keys and the action shortcuts are caught here because the focused search field
+    // would otherwise consume them.
     override func sendEvent(_ event: NSEvent) {
+        if interceptEvent?(event) == true {
+            return
+        }
         if event.type == .keyDown, event.keyCode == Self.escapeKeyCode {
             onDismiss()
             return
@@ -80,13 +91,16 @@ final class LauncherPanel: NSPanel {
     }
 
     private func keyCommand(for event: NSEvent) -> KeyCommand? {
+        if let action = AppAction(keyCode: event.keyCode, modifierFlags: event.modifierFlags) {
+            return .perform(action)
+        }
         guard event.modifierFlags.isDisjoint(with: [.command, .option, .control, .shift]) else {
             return nil
         }
         switch event.keyCode {
         case Self.upArrowKeyCode: return .moveUp
         case Self.downArrowKeyCode: return .moveDown
-        case Self.returnKeyCode, Self.keypadEnterKeyCode: return .launch
+        case Self.tabKeyCode: return .showActions
         default: return nil
         }
     }
@@ -97,12 +111,16 @@ final class LauncherPanel: NSPanel {
             onOpenSettings()
             return true
         }
+        // Cmd+Option+H is left alone, since it's the system's Hide Others.
+        if modifiers == [.command, .option, .control], event.charactersIgnoringModifiers?.lowercased() == "h" {
+            onOpenHiddenApps()
+            return true
+        }
         return super.performKeyEquivalent(with: event)
     }
 
     private static let escapeKeyCode: UInt16 = 53
-    private static let returnKeyCode: UInt16 = 36
-    private static let keypadEnterKeyCode: UInt16 = 76
+    private static let tabKeyCode: UInt16 = 48
     private static let upArrowKeyCode: UInt16 = 126
     private static let downArrowKeyCode: UInt16 = 125
 }

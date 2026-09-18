@@ -12,12 +12,36 @@ enum AppBrowseRowMetrics {
     static let bottomPadding: CGFloat = 8
     /// The letter index sits over the right edge of the app rows, below the pinned header.
     static let letterIndexWidth: CGFloat = 24
+    /// The part of the selection, at its trailing edge, that opens the actions menu.
+    static let caretAreaWidth: CGFloat = 40
+
+    static func trailingInset(reservesLetterIndex: Bool) -> CGFloat {
+        selectionInset + (reservesLetterIndex ? letterIndexWidth : 0)
+    }
+
+    /// Takes an app row's bounds in flipped coordinates.
+    static func selectionRect(inRow bounds: NSRect, reservesLetterIndex: Bool) -> NSRect {
+        // The vertical inset keeps the selection off the section header above it.
+        NSRect(
+            x: bounds.minX + selectionInset,
+            y: bounds.maxY - appHeight + 3,
+            width: bounds.width - selectionInset - trailingInset(reservesLetterIndex: reservesLetterIndex),
+            height: appHeight - 6
+        )
+    }
+
+    static func caretArea(inRow bounds: NSRect, reservesLetterIndex: Bool) -> NSRect {
+        let selection = selectionRect(inRow: bounds, reservesLetterIndex: reservesLetterIndex)
+        return NSRect(x: selection.maxX - caretAreaWidth, y: selection.minY, width: caretAreaWidth, height: selection.height)
+    }
 }
 
 final class AppBrowseCellView: NSTableCellView {
     static let identifier = NSUserInterfaceItemIdentifier("AppBrowseCell")
 
     private(set) var appURL: URL?
+    private let caret = ActionsCaretView()
+    private var caretTrailing: NSLayoutConstraint?
 
     init() {
         super.init(frame: .zero)
@@ -29,13 +53,16 @@ final class AppBrowseCellView: NSTableCellView {
         name.font = .preferredFont(forTextStyle: .title3)
         name.lineBreakMode = .byTruncatingTail
         name.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        caret.isHidden = true
 
-        for view in [icon, name] {
+        for view in [icon, name, caret] {
             view.translatesAutoresizingMaskIntoConstraints = false
             addSubview(view)
         }
         imageView = icon
         textField = name
+        let caretTrailing = caret.centerXAnchor.constraint(equalTo: trailingAnchor)
+        self.caretTrailing = caretTrailing
 
         NSLayoutConstraint.activate([
             icon.leadingAnchor.constraint(equalTo: leadingAnchor, constant: AppBrowseRowMetrics.leadingInset),
@@ -44,10 +71,12 @@ final class AppBrowseCellView: NSTableCellView {
             icon.heightAnchor.constraint(equalToConstant: AppIconCache.pointSize),
             name.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 12),
             name.trailingAnchor.constraint(
-                lessThanOrEqualTo: trailingAnchor,
-                constant: -(AppBrowseRowMetrics.letterIndexWidth + AppBrowseRowMetrics.selectionInset)
+                lessThanOrEqualTo: caret.centerXAnchor,
+                constant: -AppBrowseRowMetrics.caretAreaWidth / 2
             ),
             name.centerYAnchor.constraint(equalTo: icon.centerYAnchor),
+            caretTrailing,
+            caret.centerYAnchor.constraint(equalTo: icon.centerYAnchor),
         ])
     }
 
@@ -56,10 +85,23 @@ final class AppBrowseCellView: NSTableCellView {
         fatalError("init(coder:) is not supported")
     }
 
-    func show(_ app: IndexedApp, icon: NSImage) {
+    override var backgroundStyle: NSView.BackgroundStyle {
+        didSet {
+            caret.isHidden = backgroundStyle != .emphasized
+        }
+    }
+
+    func showActionsMenuOpen(_ isOpen: Bool) {
+        caret.pointDown(isOpen, animated: true)
+    }
+
+    func show(_ app: IndexedApp, icon: NSImage, reservesLetterIndex: Bool) {
         appURL = app.url
+        caret.pointDown(false, animated: false)
         textField?.stringValue = app.name
         imageView?.image = icon
+        caretTrailing?.constant = -(AppBrowseRowMetrics.trailingInset(reservesLetterIndex: reservesLetterIndex)
+            + AppBrowseRowMetrics.caretAreaWidth / 2)
     }
 }
 
@@ -116,16 +158,9 @@ final class AppBrowseRowView: NSTableRowView {
     }
 
     override func drawSelection(in _: NSRect) {
-        let appBounds = NSRect(
-            x: bounds.minX,
-            y: isFlipped ? bounds.maxY - AppBrowseRowMetrics.appHeight : bounds.minY,
-            width: bounds.width,
-            height: AppBrowseRowMetrics.appHeight
-        )
-        // The vertical inset keeps the selection off the section header above it.
-        var rect = appBounds.insetBy(dx: AppBrowseRowMetrics.selectionInset, dy: 3)
-        if reservesLetterIndex {
-            rect.size.width -= AppBrowseRowMetrics.letterIndexWidth
+        var rect = AppBrowseRowMetrics.selectionRect(inRow: bounds, reservesLetterIndex: reservesLetterIndex)
+        if !isFlipped {
+            rect.origin.y = bounds.maxY - rect.maxY
         }
         NSColor.selectedContentBackgroundColor.setFill()
         NSBezierPath(roundedRect: rect, xRadius: 8, yRadius: 8).fill()

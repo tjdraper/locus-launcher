@@ -78,6 +78,45 @@ struct BrowseListTests {
         #expect(list.firstAppRow == 1)
     }
 
+    @Test
+    func selectsTheAppThatTakesARemovedAppsPlace() {
+        // Arrange
+        let apps = [app("Calendar"), app("Chess"), app("Mail")]
+        let previous = BrowseList(apps: apps)
+
+        // Act
+        let row = BrowseList(apps: [apps[0], apps[2]]).row(replacing: apps[1], removedFrom: previous)
+
+        // Assert
+        #expect(row == 3)
+    }
+
+    @Test
+    func selectsTheNewLastAppWhenTheLastAppIsRemoved() {
+        // Arrange
+        let apps = [app("Calendar"), app("Mail")]
+        let previous = BrowseList(searchResults: apps)
+
+        // Act
+        let row = BrowseList(searchResults: [apps[0]]).row(replacing: apps[1], removedFrom: previous)
+
+        // Assert
+        #expect(row == 0)
+    }
+
+    @Test
+    func findsNoReplacementWhenOtherAppsChanged() {
+        // Arrange
+        let apps = [app("Calendar"), app("Chess"), app("Mail")]
+        let previous = BrowseList(apps: apps)
+
+        // Act
+        let row = BrowseList(apps: [apps[2]]).row(replacing: apps[1], removedFrom: previous)
+
+        // Assert
+        #expect(row == nil)
+    }
+
     private func app(_ name: String) -> IndexedApp {
         IndexedApp(url: URL(fileURLWithPath: "/Applications/\(name).app"), name: name, bundleIdentifier: nil)
     }

@@ -5,9 +5,12 @@ final class LauncherPanelPresenter {
     private static let sessionGracePeriod: Duration = .seconds(10)
 
     private let settings: SettingsWindowPresenter
+    private let hiddenAppsWindow: HiddenAppsWindowPresenter
     private let updates: UpdateController
     private let appIndex: AppIndexStore
     private let appIcons: AppIconCache
+    private let hiddenApps: HiddenAppsStore
+    private let newWindowOpener: NewWindowOpener
     private let launchHistory = LaunchHistoryStore()
     private lazy var panel = LauncherPanel(
         onDismiss: { [weak self] in
@@ -17,6 +20,10 @@ final class LauncherPanelPresenter {
             self?.dismiss()
             self?.settings.show()
         },
+        onOpenHiddenApps: { [weak self] in
+            self?.dismiss()
+            self?.hiddenAppsWindow.show()
+        },
         onKeyCommand: { [weak self] command in
             self?.perform(command)
         }
@@ -25,11 +32,22 @@ final class LauncherPanelPresenter {
     private var search: AppSearchSession?
     private var sessionEnd: Task<Void, Never>?
 
-    init(settings: SettingsWindowPresenter, updates: UpdateController, appIndex: AppIndexStore, appIcons: AppIconCache) {
+    init(
+        settings: SettingsWindowPresenter,
+        hiddenAppsWindow: HiddenAppsWindowPresenter,
+        updates: UpdateController,
+        appIndex: AppIndexStore,
+        appIcons: AppIconCache,
+        hiddenApps: HiddenAppsStore,
+        accessibilityAccess: AccessibilityAccessStore
+    ) {
         self.settings = settings
+        self.hiddenAppsWindow = hiddenAppsWindow
         self.updates = updates
         self.appIndex = appIndex
         self.appIcons = appIcons
+        self.hiddenApps = hiddenApps
+        newWindowOpener = NewWindowOpener(access: accessibilityAccess)
     }
 
     func toggle() {
@@ -58,6 +76,7 @@ final class LauncherPanelPresenter {
     func dismiss() {
         guard panel.isVisible else { return }
 
+        browse?.closeActionsMenu()
         panel.orderOut(nil)
         sessionEnd = Task { [weak self] in
             try? await Task.sleep(for: Self.sessionGracePeriod)
@@ -67,14 +86,23 @@ final class LauncherPanelPresenter {
     }
 
     private func startSession() {
-        let browse = AppBrowseTableController(icons: appIcons) { [weak self] app in
-            self?.launch(app)
+        let browse = AppBrowseTableController(icons: appIcons) { [weak self] action, app in
+            self?.perform(action, on: app)
         }
         let search = AppSearchSession(history: launchHistory.history)
         self.browse = browse
         self.search = search
+        panel.interceptEvent = { [weak browse] event in
+            browse?.handleEventWhileActionsMenuIsOpen(event) ?? false
+        }
         panel.setRootView(
-            LauncherPanelView(appIndex: appIndex, search: search, browse: browse, updates: updates) { [weak self] in
+            LauncherPanelView(
+                appIndex: appIndex,
+                hiddenApps: hiddenApps,
+                search: search,
+                browse: browse,
+                updates: updates
+            ) { [weak self] in
                 self?.dismiss()
                 self?.updates.checkForUpdates()
             }
@@ -92,13 +120,33 @@ final class LauncherPanelPresenter {
         switch command {
         case .moveUp: browse?.moveSelectionUp()
         case .moveDown: browse?.moveSelectionDown()
-        case .launch: browse?.launchSelection()
+        case .showActions: browse?.showActionsForSelection()
+        case let .perform(action):
+            if let app = browse?.selectedApp {
+                perform(action, on: app)
+            }
         }
     }
 
-    private func launch(_ app: IndexedApp) {
-        launchHistory.record(app, searchedFor: search?.query ?? "")
-        NSWorkspace.shared.openApplication(at: app.url, configuration: NSWorkspace.OpenConfiguration())
+    private func perform(_ action: AppAction, on app: IndexedApp) {
+        switch action {
+        case .open:
+            launchHistory.record(app, searchedFor: search?.query ?? "")
+            NSWorkspace.shared.openApplication(at: app.url, configuration: NSWorkspace.OpenConfiguration())
+            dismissAndEndSession()
+        case .newWindow:
+            launchHistory.record(app, searchedFor: search?.query ?? "")
+            newWindowOpener.open(app)
+            dismissAndEndSession()
+        case .revealInFinder:
+            NSWorkspace.shared.activateFileViewerSelecting([app.url])
+            dismissAndEndSession()
+        case .hide:
+            hiddenApps.hide(app)
+        }
+    }
+
+    private func dismissAndEndSession() {
         dismiss()
         // A click launches from inside the table's own mouse handling, which must finish before
         // the table is torn down.

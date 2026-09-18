@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuBarMenu: View {
     let launcherPanel: LauncherPanelPresenter
     let settings: SettingsWindowPresenter
+    let hiddenAppsWindow: HiddenAppsWindowPresenter
     let updates: UpdateController
 
     var body: some View {
@@ -14,6 +15,11 @@ struct MenuBarMenu: View {
             settings.show()
         }
         .keyboardShortcut(",")
+
+        Button("Hidden Apps…") {
+            hiddenAppsWindow.show()
+        }
+        .keyboardShortcut("h", modifiers: [.command, .option, .control])
 
         Divider()
 

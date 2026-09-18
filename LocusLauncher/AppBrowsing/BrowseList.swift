@@ -70,6 +70,26 @@ nonisolated struct BrowseList: Equatable, Sendable {
         }
     }
 
+    /// The row of the app that took the place of `removed`, when it's the only app gone since
+    /// `previous`, or of the new last app when `removed` was last.
+    func row(replacing removed: IndexedApp, removedFrom previous: BrowseList) -> Int? {
+        let previousApps = previous.apps
+        let apps = apps
+        guard let position = previousApps.firstIndex(of: removed), !apps.isEmpty,
+              apps == previousApps.filter({ $0 != removed }) else {
+            return nil
+        }
+        let appRows = rows.indices.filter { app(at: $0) != nil }
+        return appRows[min(position, appRows.count - 1)]
+    }
+
+    private var apps: [IndexedApp] {
+        rows.compactMap { row in
+            if case let .app(app) = row { return app }
+            return nil
+        }
+    }
+
     var firstAppRow: Int? {
         appRow(after: -1)
     }

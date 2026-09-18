@@ -32,6 +32,7 @@
 		32159303305C3F46009DC298 /* Exceptions for "LocusLauncher" folder in "Locus Launcher Tests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AppActions/AppAction.swift,
 				AppBrowsing/BrowseList.swift,
 				AppIndex/AppLocationPolicy.swift,
 				AppIndex/DuplicateAppResolver.swift,
@@ -39,6 +40,7 @@
 				AppSearch/AppSearchIndex.swift,
 				AppSearch/FuzzyMatcher.swift,
 				AppSearch/LaunchHistory.swift,
+				HiddenApps/HiddenAppList.swift,
 				SpotlightShortcut/SpotlightHotKeys.swift,
 			);
 			target = 32159301305C3F46009DC298 /* Locus Launcher Tests */;
