@@ -1,18 +1,19 @@
 import SwiftUI
 
-/// Every indexed app in alphabetical sections.
+/// The browse list or search results, with the letter index beside the browse list.
 struct AppBrowseView: View {
-    let appIndex: AppIndexStore
+    let list: BrowseList
     let controller: AppBrowseTableController
 
     var body: some View {
-        let list = BrowseList(apps: appIndex.apps)
         AppBrowseTable(list: list, controller: controller)
             .overlay(alignment: .trailing) {
-                BrowseLetterIndex(sectionTitles: list.sectionTitles) { title in
-                    controller.jump(toIndexTitle: title)
+                if list.hasSections {
+                    BrowseLetterIndex(sectionTitles: list.sectionTitles) { title in
+                        controller.jump(toIndexTitle: title)
+                    }
+                    .padding(.top, AppBrowseRowMetrics.headerHeight)
                 }
-                .padding(.top, AppBrowseRowMetrics.headerHeight)
             }
     }
 }

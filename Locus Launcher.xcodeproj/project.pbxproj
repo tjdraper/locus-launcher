@@ -36,6 +36,9 @@
 				AppIndex/AppLocationPolicy.swift,
 				AppIndex/DuplicateAppResolver.swift,
 				AppIndex/IndexedApp.swift,
+				AppSearch/AppSearchIndex.swift,
+				AppSearch/FuzzyMatcher.swift,
+				AppSearch/LaunchHistory.swift,
 			);
 			target = 32159301305C3F46009DC298 /* Locus Launcher Tests */;
 		};

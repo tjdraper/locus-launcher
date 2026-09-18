@@ -2,9 +2,9 @@ import SwiftUI
 
 struct LauncherPanelView: View {
     let appIndex: AppIndexStore
+    @Bindable var search: AppSearchSession
     let browse: AppBrowseTableController
 
-    @State private var query = ""
     @FocusState private var isSearchFocused: Bool
 
     var body: some View {
@@ -13,7 +13,7 @@ struct LauncherPanelView: View {
                 Image(systemName: "magnifyingglass")
                     .font(.title2)
                     .foregroundStyle(.secondary)
-                TextField("Search Apps", text: $query)
+                TextField("Search Apps", text: $search.query)
                     .textFieldStyle(.plain)
                     .font(.title)
                     .focused($isSearchFocused)
@@ -22,7 +22,14 @@ struct LauncherPanelView: View {
 
             Divider()
 
-            AppBrowseView(appIndex: appIndex, controller: browse)
+            AppBrowseView(list: list, controller: browse)
+                .overlay {
+                    if list.rows.isEmpty, !search.query.isEmpty {
+                        Text("No Matching Apps")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                    }
+                }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .glassEffect(.regular, in: .rect(cornerRadius: LauncherPanel.cornerRadius))
@@ -33,11 +40,16 @@ struct LauncherPanelView: View {
             }
         }
     }
+
+    private var list: BrowseList {
+        search.results(in: appIndex.apps).map(BrowseList.init(searchResults:)) ?? BrowseList(apps: appIndex.apps)
+    }
 }
 
 #Preview {
     LauncherPanelView(
         appIndex: AppIndexStore(),
+        search: AppSearchSession(history: LaunchHistory()),
         browse: AppBrowseTableController(icons: AppIconCache()) { _ in
             // Previews don't launch apps.
         }

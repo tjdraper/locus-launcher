@@ -47,11 +47,14 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         return scrollView
     }
 
+    /// Keeps the selected app selected while the browse list updates. Anything else, including each
+    /// new set of search results, starts from the first app.
     func show(_ newList: BrowseList) {
         guard newList != list, let tableView else { return }
 
-        let selectedURL = list.app(at: tableView.selectedRow)?.url
+        let selectedURL = list.hasSections && newList.hasSections ? list.app(at: tableView.selectedRow)?.url : nil
         list = newList
+        tableView.showsSections = list.hasSections
         tableView.reloadData()
         if let row = selectedURL.flatMap(list.row(of:)) {
             select(row, reveal: false)
@@ -116,7 +119,7 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
             target.size.height += AppBrowseRowMetrics.bottomPadding
         }
         // Leaves the same gap under a pinned header as under a section's own header.
-        var coveredTop = AppBrowseRowMetrics.headerHeight + AppBrowseRowMetrics.sectionTopGap
+        var coveredTop = list.hasSections ? AppBrowseRowMetrics.headerHeight + AppBrowseRowMetrics.sectionTopGap : 0
         if list.isHeader(row - 1) {
             target = target.union(tableView.rect(ofRow: row - 1))
             coveredTop = 0
@@ -152,7 +155,7 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         if list.isHeader(row) {
             return AppBrowseRowMetrics.headerHeight
         }
-        return AppBrowseRowMetrics.appHeight + (list.isHeader(row - 1) ? AppBrowseRowMetrics.sectionTopGap : 0)
+        return AppBrowseRowMetrics.appHeight + (list.startsSection(row) ? AppBrowseRowMetrics.sectionTopGap : 0)
     }
 
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
@@ -160,8 +163,10 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
             return tableView.makeView(withIdentifier: AppBrowseHeaderRowView.identifier, owner: nil) as? NSTableRowView
                 ?? AppBrowseHeaderRowView()
         }
-        return tableView.makeView(withIdentifier: AppBrowseRowView.identifier, owner: nil) as? NSTableRowView
+        let rowView = tableView.makeView(withIdentifier: AppBrowseRowView.identifier, owner: nil) as? AppBrowseRowView
             ?? AppBrowseRowView()
+        rowView.reservesLetterIndex = list.hasSections
+        return rowView
     }
 
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {

@@ -7,6 +7,7 @@ final class LauncherPanelPresenter {
     private let settings: SettingsWindowPresenter
     private let appIndex: AppIndexStore
     private let appIcons: AppIconCache
+    private let launchHistory = LaunchHistoryStore()
     private lazy var panel = LauncherPanel(
         onDismiss: { [weak self] in
             self?.dismiss()
@@ -20,6 +21,7 @@ final class LauncherPanelPresenter {
         }
     )
     private var browse: AppBrowseTableController?
+    private var search: AppSearchSession?
     private var sessionEnd: Task<Void, Never>?
 
     init(settings: SettingsWindowPresenter, appIndex: AppIndexStore, appIcons: AppIconCache) {
@@ -66,13 +68,16 @@ final class LauncherPanelPresenter {
         let browse = AppBrowseTableController(icons: appIcons) { [weak self] app in
             self?.launch(app)
         }
+        let search = AppSearchSession(history: launchHistory.history)
         self.browse = browse
-        panel.setRootView(LauncherPanelView(appIndex: appIndex, browse: browse))
+        self.search = search
+        panel.setRootView(LauncherPanelView(appIndex: appIndex, search: search, browse: browse))
     }
 
     private func endSession() {
         sessionEnd?.cancel()
         browse = nil
+        search = nil
         panel.contentView = nil
     }
 
@@ -85,6 +90,7 @@ final class LauncherPanelPresenter {
     }
 
     private func launch(_ app: IndexedApp) {
+        launchHistory.record(app, searchedFor: search?.query ?? "")
         NSWorkspace.shared.openApplication(at: app.url, configuration: NSWorkspace.OpenConfiguration())
         dismiss()
         // A click launches from inside the table's own mouse handling, which must finish before

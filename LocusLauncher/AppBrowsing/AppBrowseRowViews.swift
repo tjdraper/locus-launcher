@@ -4,7 +4,8 @@ enum AppBrowseRowMetrics {
     static let appHeight: CGFloat = 44
     static let headerHeight: CGFloat = 28
     /// Empty space at the top of each section's first app row, so its selection sits apart from
-    /// the header. It belongs to the app row so nothing shows through below a pinned header.
+    /// the header, or from the search field above search results. It belongs to the app row so
+    /// nothing shows through below a pinned header.
     static let sectionTopGap: CGFloat = 6
     static let leadingInset: CGFloat = 20
     static let selectionInset: CGFloat = 8
@@ -93,6 +94,12 @@ final class AppBrowseHeaderView: NSTableCellView {
 final class AppBrowseRowView: NSTableRowView {
     static let identifier = NSUserInterfaceItemIdentifier("AppBrowseRow")
 
+    var reservesLetterIndex = true {
+        didSet {
+            needsDisplay = true
+        }
+    }
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         identifier = Self.identifier
@@ -117,7 +124,9 @@ final class AppBrowseRowView: NSTableRowView {
         )
         // The vertical inset keeps the selection off the section header above it.
         var rect = appBounds.insetBy(dx: AppBrowseRowMetrics.selectionInset, dy: 3)
-        rect.size.width -= AppBrowseRowMetrics.letterIndexWidth
+        if reservesLetterIndex {
+            rect.size.width -= AppBrowseRowMetrics.letterIndexWidth
+        }
         NSColor.selectedContentBackgroundColor.setFill()
         NSBezierPath(roundedRect: rect, xRadius: 8, yRadius: 8).fill()
     }

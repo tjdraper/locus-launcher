@@ -1,6 +1,7 @@
 import Foundation
 
-/// The apps grouped into alphabetical sections, flattened into the rows the browse table shows.
+/// The rows the browse table shows: every app in alphabetical sections, or search results in
+/// ranked order with no sections.
 nonisolated struct BrowseList: Equatable, Sendable {
     enum Row: Equatable, Sendable {
         case header(String)
@@ -12,6 +13,7 @@ nonisolated struct BrowseList: Equatable, Sendable {
 
     let rows: [Row]
     let sectionTitles: Set<String>
+    let hasSections: Bool
     private let headerRows: [String: Int]
 
     /// Keeps the order of `apps` within each section.
@@ -28,6 +30,14 @@ nonisolated struct BrowseList: Equatable, Sendable {
         self.rows = rows
         self.headerRows = headerRows
         sectionTitles = Set(headerRows.keys)
+        hasSections = true
+    }
+
+    init(searchResults: [IndexedApp]) {
+        rows = searchResults.map(Row.app)
+        headerRows = [:]
+        sectionTitles = []
+        hasSections = false
     }
 
     static func sectionTitle(for name: String) -> String {
@@ -46,6 +56,11 @@ nonisolated struct BrowseList: Equatable, Sendable {
     func isHeader(_ row: Int) -> Bool {
         guard rows.indices.contains(row), case .header = rows[row] else { return false }
         return true
+    }
+
+    /// The first app row of a section, or of search results, which has empty space above it.
+    func startsSection(_ row: Int) -> Bool {
+        isHeader(row - 1) || (!hasSections && row == 0)
     }
 
     func row(of url: URL) -> Int? {
