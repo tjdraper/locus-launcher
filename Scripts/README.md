@@ -1,7 +1,7 @@
 # Releasing
 
 ```
-Scripts/release.sh 1.0.1
+Scripts/release.sh 2026.4
 ```
 
 The script bumps the version, archives, exports a Developer ID build, notarizes it, staples the ticket, re-zips the stapled app, and adds the release to `docs/appcast.xml`. It does not publish: it prints the `gh release create` and `git` commands to run, in the order that keeps the download live before the feed points at it.
@@ -13,6 +13,33 @@ Release notes are required. If `docs/LocusLauncher-<version>.md` is missing, the
 The script refuses to run unless the branch is clean, has an upstream, and is exactly in sync with it. The release tag has to land on the commit the build came from, which is impossible if there is unpushed work in the way.
 
 If a release fails partway, undo the version bump and the appcast entry with `git checkout -- "Locus Launcher.xcodeproj/project.pbxproj" docs`.
+
+## Versions and the beta channel
+
+Versions are `YYYY.N` for a release and `YYYY.N.B` for a beta. Betas leading to `2026.4` are numbered `2026.3.1`, `2026.3.2` and so on: each sits above the `2026.3` release and below the `2026.4` it becomes. A year starts its betas at `YYYY.0.1` and its first release at `YYYY.1`.
+
+```
+2026.2      release
+2026.2.1    beta
+2026.2.2    beta
+2026.3      release
+2027.0.1    beta
+2027.1      release
+```
+
+The script reads the channel off the shape of the version, so the two cannot disagree. A three-part version is a beta: `generate_appcast` gets `--channel beta`, and the printed `gh release create` gets `--prerelease`.
+
+Beta and release share one appcast. A beta item carries `<sparkle:channel>beta</sparkle:channel>`, which Sparkle only offers to updaters that ask for that channel by name, so everyone else sees releases only.
+
+Opt a Mac in with:
+
+```
+defaults write com.buzzingpixel.LocusLauncher ReceiveBetaUpdates -bool YES
+```
+
+and back out with `-bool NO`. There is no UI for this yet.
+
+A beta cannot be promoted in place, because `CFBundleVersion` is the version: `2026.3.2` ships again as `2026.4`, rebuilt and re-notarized.
 
 ## One-time setup
 

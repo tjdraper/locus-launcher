@@ -34,8 +34,18 @@ step() {
 # --- Arguments -------------------------------------------------------------
 
 readonly VERSION="${1:-}"
-[[ -n "$VERSION" ]] || fail "usage: Scripts/release.sh <version>   (for example: 1.0.1)"
-[[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] || fail "version must look like 1.0 or 1.0.1, got '$VERSION'"
+[[ -n "$VERSION" ]] \
+    || fail "usage: Scripts/release.sh <version>   (2026.4 for a release, 2026.3.1 for a beta)"
+
+# The shape of the version picks the channel, so the two can never disagree. Betas leading to
+# YYYY.N are numbered YYYY.(N-1).B, which keeps them below that release and above the one before.
+if [[ "$VERSION" =~ ^[0-9]{4}\.[0-9]+$ ]]; then
+    readonly CHANNEL=""
+elif [[ "$VERSION" =~ ^[0-9]{4}\.[0-9]+\.[0-9]+$ ]]; then
+    readonly CHANNEL="beta"
+else
+    fail "version must be YYYY.N for a release or YYYY.N.B for a beta, got '$VERSION'"
+fi
 
 # Written by hand, and published as-is: Sparkle fetches it from the same place as the appcast.
 readonly RELEASE_NOTES="$REPO_ROOT/docs/$ARTIFACT_NAME-$VERSION.md"
@@ -171,9 +181,17 @@ cp "$APPCAST" "$STAGE_DIR/appcast.xml"
 # generate_appcast pairs notes with an archive by filename, which is why both are named alike.
 cp "$RELEASE_NOTES" "$STAGE_DIR/$ARTIFACT_NAME-$VERSION.md"
 
+# Items with no channel are the default one, which every updater sees. A beta item is only
+# offered to updaters that ask for the channel by name.
+# The +"..." guard is for bash 3.2, which macOS still ships: it treats an empty array as unset
+# under `set -u` and would abort on a plain "${channel_args[@]}".
+channel_args=()
+[[ -n "$CHANNEL" ]] && channel_args=(--channel "$CHANNEL")
+
 "$SPARKLE_BIN/generate_appcast" \
     --download-url-prefix "https://github.com/$GITHUB_REPO/releases/download/v$VERSION/" \
     --link "https://github.com/$GITHUB_REPO" \
+    ${channel_args[@]+"${channel_args[@]}"} \
     -o "$STAGE_DIR/appcast.xml" \
     "$STAGE_DIR"
 
@@ -183,7 +201,7 @@ cp "$STAGE_DIR/appcast.xml" "$APPCAST"
 
 cat <<EOF
 
-Built and notarized $APP_NAME $VERSION.
+Built and notarized $APP_NAME $VERSION$( [[ -n "$CHANNEL" ]] && echo " on the $CHANNEL channel" ).
 
   app: $EXPORTED_APP
   zip: $ZIP
@@ -194,7 +212,7 @@ the feed points at it:
   git add "$PBXPROJ" docs && git commit -m "Release $VERSION"
   git tag v$VERSION
   git push origin v$VERSION
-  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION" --verify-tag --notes-file $RELEASE_NOTES_PATH
+  gh release create v$VERSION "$ZIP" --repo $GITHUB_REPO --title "$VERSION" --verify-tag --notes-file $RELEASE_NOTES_PATH$( [[ -n "$CHANNEL" ]] && echo " --prerelease" )
   git push
 
 If you stop here, undo the version bump and the appcast entry with:

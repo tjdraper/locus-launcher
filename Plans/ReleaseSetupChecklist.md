@@ -43,10 +43,10 @@ The key is already generated and in your login Keychain. Its public half is in `
 
 ## First release
 
-- [x] `Scripts/release.sh 1.0.0`
+- [x] `Scripts/release.sh 2026.0.1`
 - [x] Run the two commands it prints, in the order it prints them.
 - [x] Download the published zip on a Mac that has never run the app, unzip it in Downloads, and open it. You should get no Gatekeeper warning, and the offer to move it to Applications.
-- [x] Ship a throwaway `1.0.1` and let an installed `1.0.0` update itself. Sparkle problems only show up on the second release, so do this before anyone else is relying on it.
+- [x] Ship a throwaway `2026.0.2` and let an installed `2026.0.1` update itself. Sparkle problems only show up on the second release, so do this before anyone else is relying on it.
 
 ## Not set up on purpose
 

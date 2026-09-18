@@ -5,6 +5,7 @@ import SwiftUI
 /// while a check is already running.
 @Observable
 final class UpdateController {
+    private let channelSelector: UpdateChannelSelector
     private let menuBarFocus: MenuBarUpdateFocus
     private let updaterController: SPUStandardUpdaterController
     private var readinessObservation: NSKeyValueObservation?
@@ -13,10 +14,12 @@ final class UpdateController {
 
     init() {
         let focus = MenuBarUpdateFocus()
+        let channels = UpdateChannelSelector()
         menuBarFocus = focus
+        channelSelector = channels
         updaterController = SPUStandardUpdaterController(
             startingUpdater: false,
-            updaterDelegate: nil,
+            updaterDelegate: channels,
             userDriverDelegate: focus
         )
         readinessObservation = updaterController.updater.observe(
@@ -36,6 +39,14 @@ final class UpdateController {
 
     func checkForUpdates() {
         updaterController.checkForUpdates(nil)
+    }
+}
+
+/// Beta items in the appcast are only offered to updaters that name the channel here. Everyone
+/// else sees the default channel alone.
+private final class UpdateChannelSelector: NSObject, SPUUpdaterDelegate {
+    nonisolated func allowedChannels(for _: SPUUpdater) -> Set<String> {
+        UpdateChannelPreference().allowedChannels
     }
 }
 

@@ -44,6 +44,7 @@
    - Launch at login (`SMAppService`)
    - Shortcut recorder for the launcher hotkey
    - Turn off Spotlight's Cmd+Space shortcut from the app, with a fallback link to System Settings (see Decisions)
+   - Beta updates toggle. Sparkle's channel filter already reads the `ReceiveBetaUpdates` default (slice 2), so this is a checkbox bound to that key, with a line explaining that betas ship more often and may break.
 
 8. **Per-app shortcuts**
    - Assign a shortcut to an app
@@ -71,7 +72,7 @@
 - **Cmd+Space:** macOS gives it to Spotlight. The app offers a button that turns off Spotlight's shortcut by editing `com.apple.symbolichotkeys.plist` (entries 64 and 65) and applying the change without a logout. This is undocumented, so it needs testing on each macOS release, and it falls back to opening the right System Settings page. When the app changed the setting, it offers to turn it back on if the user picks a different launcher hotkey or quits for good.
 - **Accessibility permission:** opening a new window means activating the app and sending it Cmd+N, which needs Accessibility access. The wizard asks for it but the user can skip. Without it, "open new window" shortcuts only activate the app, and Settings says so next to that option with a way to grant access. Apps that ignore Cmd+N also fall back to activating.
 - **No App Sandbox:** sending keystrokes to other apps and editing Spotlight's shortcut don't work in the sandbox. Signing and notarization still work. App Store distribution isn't a goal.
-- **Updates:** Sparkle, with release zips and the appcast on GitHub and the feed URL on a domain we control.
+- **Updates:** Sparkle, with release zips on GitHub Releases and the appcast served from GitHub Pages at `https://tjdraper.github.io/locus-launcher/appcast.xml`. Betas ride the same feed on a Sparkle channel.
 - **Distribution:** a notarized, stapled `.app` in a zip, not a DMG.
 - **Launch history:** stays local to each Mac and isn't synced, since installed apps differ between Macs.
 - **Search scope:** the main launcher searches apps only. No settings search.
@@ -96,7 +97,7 @@ The GitHub repo will be public, and it will host the release zips and the Sparkl
 - Never commit secrets: signing certificates, notarization credentials, or the Sparkle private key. The release script reads them from the Keychain or environment variables.
 - Write everything in the repo (code, comments, commit messages, plans, docs) as if the public will read it.
 - `.gitignore` covers `.DS_Store`, `xcuserdata`, build output and local config from the start.
-- Serve the Sparkle feed URL from a domain you control, so hosting can move later without breaking updates for existing installs.
+- The Sparkle feed URL is baked into every build and can never change, so moving hosting later means adding a custom domain to the same GitHub Pages site rather than picking a new URL. GitHub redirects the `github.io` address, and Sparkle follows redirects, so installs already in the wild keep updating.
 
 ## Useful from locus-todo
 
