@@ -68,6 +68,7 @@
 
 11. **Polish and first release**
     - App icon, website download, v1
+    - Custom menu bar icon to replace the `square.grid.2x2` SF Symbol. It has to keep working with the red update badge, which `MenuBarIcon` draws into the image.
 
 ## Decisions
 
