@@ -21,6 +21,25 @@ struct AppShortcutEditorPlacementTests {
     }
 
     @Test
+    func stepsAsideWhenAnEditorIsAlreadyOpenWhereItWouldGo() {
+        // Arrange
+        let placement = AppShortcutEditorPlacement(
+            anchor: CGRect(x: 400, y: 200, width: 600, height: 500),
+            visibleScreenFrame: screen
+        )
+
+        // Act
+        let origin = placement.origin(for: editorSize, avoiding: [
+            CGRect(origin: CGPoint(x: 500, y: 400), size: editorSize),
+            // A shorter editor whose top-left corner is where the first step would land.
+            CGRect(x: 524, y: 476, width: 560, height: 200),
+        ])
+
+        // Assert
+        #expect(origin == CGPoint(x: 548, y: 352))
+    }
+
+    @Test
     func staysOnScreenWhenTheAnchorIsNearAnEdge() {
         // Arrange
         let placement = AppShortcutEditorPlacement(

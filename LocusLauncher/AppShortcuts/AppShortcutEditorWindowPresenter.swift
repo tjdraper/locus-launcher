@@ -1,16 +1,16 @@
 import AppKit
 import SwiftUI
 
-/// Shows the Manage Hot Keys window, one app at a time. It opens over whatever opened it and
-/// doesn't remember where it was, since it belongs to that window or panel.
+/// Shows the Manage Hot Keys window, one per app, so several apps can be edited side by side. Each
+/// one opens over whatever opened it and doesn't remember where it was, since it belongs to that
+/// window or panel.
 final class AppShortcutEditorWindowPresenter: NSObject, NSWindowDelegate {
     private let store: AppShortcutStore
     private let appIndex: AppIndexStore
     private let appIcons: AppIconCache
     private let accessibilityAccess: AccessibilityAccessStore
     private let dockIcon: DockIconPresence
-    private var shownAppID: String?
-    private lazy var window = makeWindow()
+    private var windowsByAppID: [String: NSWindow] = [:]
 
     init(
         store: AppShortcutStore,
@@ -36,10 +36,23 @@ final class AppShortcutEditorWindowPresenter: NSObject, NSWindowDelegate {
 
     /// The anchor is in screen coordinates.
     func show(appID: String, appName: String, over anchor: NSRect) {
-        if let shownAppID, shownAppID != appID {
-            store.removeUnrecorded(forAppID: shownAppID)
-        }
-        shownAppID = appID
+        let window = windowsByAppID[appID] ?? makeWindow(appID: appID, appName: appName, over: anchor)
+        windowsByAppID[appID] = window
+        dockIcon.windowWillShow(window)
+        AppActivation.bringToFront()
+        window.makeKeyAndOrderFront(nil)
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow,
+              let appID = windowsByAppID.first(where: { $0.value === window })?.key else { return }
+        store.removeUnrecorded(forAppID: appID)
+        windowsByAppID[appID] = nil
+        dockIcon.windowWillClose(window)
+    }
+
+    private func makeWindow(appID: String, appName: String, over anchor: NSRect) -> NSWindow {
+        let window = NSWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: true)
         window.contentViewController = NSHostingController(rootView: AppShortcutEditorView(
             appID: appID,
             appName: appName,
@@ -49,33 +62,17 @@ final class AppShortcutEditorWindowPresenter: NSObject, NSWindowDelegate {
             accessibilityAccess: accessibilityAccess
         ))
         window.title = "\(appName) Hot Keys"
-        if !window.isVisible {
-            place(over: anchor)
-        }
-        dockIcon.windowWillShow(window)
-        AppActivation.bringToFront()
-        window.makeKeyAndOrderFront(nil)
+        window.isReleasedWhenClosed = false
+        window.delegate = self
+        place(window, over: anchor)
+        return window
     }
 
-    func windowWillClose(_: Notification) {
-        if let shownAppID {
-            store.removeUnrecorded(forAppID: shownAppID)
-        }
-        shownAppID = nil
-        dockIcon.windowWillClose(window)
-    }
-
-    private func place(over anchor: NSRect) {
+    private func place(_ window: NSWindow, over anchor: NSRect) {
         guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(anchor) }) ?? NSScreen.main else { return }
         window.layoutIfNeeded()
         let placement = AppShortcutEditorPlacement(anchor: anchor, visibleScreenFrame: screen.visibleFrame)
-        window.setFrameOrigin(placement.origin(for: window.frame.size))
-    }
-
-    private func makeWindow() -> NSWindow {
-        let window = NSWindow(contentRect: .zero, styleMask: [.titled, .closable], backing: .buffered, defer: true)
-        window.isReleasedWhenClosed = false
-        window.delegate = self
-        return window
+        let taken = windowsByAppID.values.filter(\.isVisible).map(\.frame)
+        window.setFrameOrigin(placement.origin(for: window.frame.size, avoiding: taken))
     }
 }
