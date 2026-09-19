@@ -76,6 +76,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if !isFirstRun {
             ApplicationsFolderMoveWorkflow().offerIfNeeded()
         }
+        // Answered before Sparkle's first check, which would otherwise still look for betas.
+        BetaTrackExitWorkflow().offerIfNeeded()
         updates.start()
         appIndex.start()
         appIcons.start(observing: appIndex)

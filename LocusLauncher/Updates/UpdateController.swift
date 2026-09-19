@@ -41,6 +41,10 @@ final class UpdateController {
         }
     }
 
+    var isRunningBeta: Bool {
+        UpdateChannelPreference().isRunningBeta
+    }
+
     init() {
         let reminder = UpdateReminder()
         let updaterDelegate = UpdaterDelegate(reminder: reminder)

@@ -45,6 +45,7 @@
 				HiddenApps/HiddenAppList.swift,
 				ICloudSync/SyncMerge.swift,
 				SpotlightShortcut/SpotlightHotKeys.swift,
+				Updates/UpdateChannelPreference.swift,
 			);
 			target = 32159301305C3F46009DC298 /* Locus Launcher Tests */;
 		};
