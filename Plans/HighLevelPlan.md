@@ -68,7 +68,7 @@
    - Detect conflicting shortcuts: the same keys can't be used by two app shortcuts or by an app shortcut and the launcher. The recorder warns about shortcuts the system uses. Shortcuts other apps register can't be detected.
    - Each shortcut has a "Sync to other Macs" choice, stored for slice 10
    - Shortcuts keep working for hidden apps
-   - Show an app's assigned shortcuts in its launcher row, up to two, then a count
+   - Show the first of an app's assigned shortcuts in its launcher row
    - An App Hot Keys window, opened from the menu bar menu or with Cmd+Option+K while the panel has focus, lists every app with shortcuts, including apps no longer on this Mac, with a way to edit them. It's a separate window like Hidden Apps, to keep Settings short.
 
 10. **iCloud sync**
