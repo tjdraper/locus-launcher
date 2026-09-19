@@ -62,6 +62,10 @@ final class AppActionsMenu {
         case Self.downArrowKeyCode where modifiers.isEmpty:
             menuView.moveHighlightDown()
             return .handled
+        // The Right arrow that opens the menu often stays down; its repeats would otherwise fall
+        // through to the search field and close the menu again.
+        case Self.rightArrowKeyCode where modifiers.isEmpty:
+            return .handled
         case Self.escapeKeyCode, Self.tabKeyCode:
             return .close
         default:
@@ -88,6 +92,7 @@ final class AppActionsMenu {
     private static let escapeKeyCode: UInt16 = 53
     private static let upArrowKeyCode: UInt16 = 126
     private static let downArrowKeyCode: UInt16 = 125
+    private static let rightArrowKeyCode: UInt16 = 124
 }
 
 /// Never takes keyboard focus, so the launcher panel stays key and doesn't close.

@@ -24,6 +24,8 @@ final class LauncherPanel: NSPanel {
     /// panel's events this way while it's open.
     var interceptEvent: ((NSEvent) -> Bool)?
 
+    private var rightArrow = RightArrowMenuGate()
+
     init(
         onDismiss: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
@@ -85,12 +87,22 @@ final class LauncherPanel: NSPanel {
             onKeyCommand(command)
             return
         }
+        if event.type == .keyUp, event.keyCode == Self.rightArrowKeyCode {
+            rightArrow.keyReleased(at: event.timestamp)
+        }
         super.sendEvent(event)
     }
 
     /// While an input method is composing text, the arrows pick candidates and Return commits.
     private var isComposingText: Bool {
         (firstResponder as? NSTextView)?.hasMarkedText() == true
+    }
+
+    /// A selection counts as text to move through, since Right arrow collapses it to its end.
+    private var searchCursorIsAtEnd: Bool {
+        guard let editor = firstResponder as? NSTextView else { return true }
+        let selection = editor.selectedRange()
+        return selection.length == 0 && selection.location == (editor.string as NSString).length
     }
 
     private func keyCommand(for event: NSEvent) -> KeyCommand? {
@@ -108,6 +120,10 @@ final class LauncherPanel: NSPanel {
         case Self.upArrowKeyCode: return .moveUp
         case Self.downArrowKeyCode: return .moveDown
         case Self.tabKeyCode: return .showActions
+        case Self.rightArrowKeyCode:
+            return rightArrow.pressOpensActionsMenu(cursorIsAtEnd: searchCursorIsAtEnd, at: event.timestamp)
+                ? .showActions
+                : nil
         default: return nil
         }
     }
@@ -134,4 +150,5 @@ final class LauncherPanel: NSPanel {
     private static let tabKeyCode: UInt16 = 48
     private static let upArrowKeyCode: UInt16 = 126
     private static let downArrowKeyCode: UInt16 = 125
+    private static let rightArrowKeyCode: UInt16 = 124
 }

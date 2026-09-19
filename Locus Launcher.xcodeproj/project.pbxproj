@@ -45,6 +45,7 @@
 				FirstRun/FirstRunStatus.swift,
 				HiddenApps/HiddenAppList.swift,
 				ICloudSync/SyncMerge.swift,
+				LauncherPanel/RightArrowMenuGate.swift,
 				SpotlightShortcut/SpotlightHotKeys.swift,
 				Updates/UpdateChannelPreference.swift,
 			);
