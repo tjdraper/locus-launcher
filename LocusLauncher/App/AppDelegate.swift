@@ -26,7 +26,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appShortcuts: appShortcuts,
         launchAtLogin: launchAtLogin,
         spotlight: spotlight,
-        firstRunWindow: firstRunWindow,
         dockIcon: dockIcon
     )
     lazy var hiddenAppsWindow = HiddenAppsWindowPresenter(

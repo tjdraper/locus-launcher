@@ -7,7 +7,6 @@ struct SettingsView: View {
     let spotlight: SpotlightShortcutStore
     let accessibilityAccess: AccessibilityAccessStore
     let appShortcuts: AppShortcutStore
-    let onShowSetup: () -> Void
 
     var body: some View {
         Form {
@@ -25,15 +24,6 @@ struct SettingsView: View {
             }
 
             UpdateSettingsSection(updates: updates)
-
-            Section {
-                LabeledContent {
-                    Button("Show…", action: onShowSetup)
-                } label: {
-                    Text("Setup checklist")
-                    Text("Every setup step on one page, as shown on first launch.")
-                }
-            }
         }
         .formStyle(.grouped)
         .frame(width: 460)
@@ -60,7 +50,6 @@ struct SettingsView: View {
         launchAtLogin: LaunchAtLoginStore(),
         spotlight: SpotlightShortcutStore(),
         accessibilityAccess: AccessibilityAccessStore(),
-        appShortcuts: AppShortcutStore(),
-        onShowSetup: { print("Show setup") }
+        appShortcuts: AppShortcutStore()
     )
 }

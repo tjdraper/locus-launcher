@@ -11,7 +11,6 @@ final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
     private let dockIcon: DockIconPresence
     private let launchAtLogin: LaunchAtLoginStore
     private let spotlight: SpotlightShortcutStore
-    private let firstRunWindow: FirstRunWindowPresenter
     private lazy var window = makeWindow()
 
     init(
@@ -20,7 +19,6 @@ final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
         appShortcuts: AppShortcutStore,
         launchAtLogin: LaunchAtLoginStore,
         spotlight: SpotlightShortcutStore,
-        firstRunWindow: FirstRunWindowPresenter,
         dockIcon: DockIconPresence
     ) {
         self.updates = updates
@@ -28,7 +26,6 @@ final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
         self.appShortcuts = appShortcuts
         self.launchAtLogin = launchAtLogin
         self.spotlight = spotlight
-        self.firstRunWindow = firstRunWindow
         self.dockIcon = dockIcon
     }
 
@@ -52,10 +49,7 @@ final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
                 launchAtLogin: launchAtLogin,
                 spotlight: spotlight,
                 accessibilityAccess: accessibilityAccess,
-                appShortcuts: appShortcuts,
-                onShowSetup: { [weak self] in
-                    self?.firstRunWindow.show()
-                }
+                appShortcuts: appShortcuts
             )
         ))
         window.title = "Locus Launcher Settings"
