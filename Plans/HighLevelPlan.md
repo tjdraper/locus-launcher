@@ -88,8 +88,12 @@
     - Each step reflects the real current state, so granting a permission in System Settings updates the wizard
 
 12. **Polish and first release**
-    - App icon, website download, v1
+    - Website download, v1. The app icon stays as it is.
     - Custom menu bar icon to replace the `square.grid.2x2` SF Symbol. It has to keep working with the red update badge, which `MenuBarIcon` draws into the image.
+    - Every window except the launcher panel opens centered on the primary display the first time, then remembers where the user put it. `NSWindow.center()` runs before SwiftUI has sized the window, so it lands off center; the setup checklist already works around this. Only Hidden Apps and App Hot Keys remember their position today. Settings and the setup checklist don't.
+    - The hot key editor is the exception: it opens near what opened it and doesn't remember its position. From the launcher panel (Manage Hot Keys), it opens where the panel was. From the App Hot Keys window, it opens over that window, like a sheet would. Today it centers itself on whichever screen AppKit picks.
+    - Remove the setup checklist row from Settings. The menu bar menu still opens it.
+    - Right arrow opens the selected row's actions menu when the search field's cursor is at the end of the text. Otherwise it moves the cursor as usual. When a Right arrow press moves the cursor to the end, it doesn't open the menu too, even while the key repeats. After the key is released with the cursor at the end, a short delay passes before Right arrow opens the menu again. Tab still opens the menu.
 
 ## Decisions
 
