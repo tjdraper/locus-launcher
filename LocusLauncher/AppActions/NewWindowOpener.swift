@@ -7,7 +7,6 @@ import Carbon.HIToolbox
 /// since an app that's just starting shows a window of its own.
 struct NewWindowOpener {
     private static let activationTimeout: Duration = .seconds(2)
-    private static let menuItemTitle = "New Window"
     /// A hung app would otherwise hold the launcher for the system's default of several seconds.
     private static let menuTimeout: Float = 1
 
@@ -55,14 +54,24 @@ struct NewWindowOpener {
         let menuItems = children(of: menuBar)
             .flatMap(children(of:))
             .flatMap(children(of:))
-        guard let item = menuItems.first(where: { element in
-            let title: String? = value(of: kAXTitleAttribute, in: element)
-            let isEnabled: Bool? = value(of: kAXEnabledAttribute, in: element)
-            return title?.caseInsensitiveCompare(menuItemTitle) == .orderedSame && isEnabled == true
-        }) else {
-            return false
-        }
+        let item = menuItemTitles(for: processIdentifier).lazy.compactMap { menuItemTitle in
+            menuItems.first { element in
+                let title: String? = value(of: kAXTitleAttribute, in: element)
+                let isEnabled: Bool? = value(of: kAXEnabledAttribute, in: element)
+                return title?.caseInsensitiveCompare(menuItemTitle) == .orderedSame && isEnabled == true
+            }
+        }.first
+        guard let item else { return false }
         return AXUIElementPerformAction(item, kAXPressAction as CFString) == .success
+    }
+
+    /// Finder names its item New Finder Window, and ignores a Cmd+N posted to it. Matching only
+    /// the app's own name keeps items such as New Private Window out.
+    private static func menuItemTitles(for processIdentifier: pid_t) -> [String] {
+        guard let appName = NSRunningApplication(processIdentifier: processIdentifier)?.localizedName else {
+            return ["New Window"]
+        }
+        return ["New Window", "New \(appName) Window"]
     }
 
     /// For apps without a New Window menu item, including apps whose menus aren't in English.
