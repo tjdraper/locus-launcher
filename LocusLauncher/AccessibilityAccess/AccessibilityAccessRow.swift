@@ -6,8 +6,13 @@ struct AccessibilityAccessRow: View {
     var body: some View {
         LabeledContent {
             if store.isGranted {
-                Label("Allowed", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.secondary)
+                Label {
+                    Text("Allowed")
+                        .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                }
             } else {
                 Button("Allow…") {
                     store.requestAccess()

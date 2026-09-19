@@ -6,8 +6,13 @@ struct ApplicationsFolderRow: View {
     var body: some View {
         LabeledContent {
             if workflow.location.isInApplicationsFolder {
-                Label("Done", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.secondary)
+                Label {
+                    Text("Done")
+                        .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                }
             } else {
                 Button("Move to Applications") {
                     workflow.move()
