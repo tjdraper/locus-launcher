@@ -40,6 +40,7 @@
 				AppSearch/AppSearchIndex.swift,
 				AppSearch/FuzzyMatcher.swift,
 				AppSearch/LaunchHistory.swift,
+				AppShortcuts/AppShortcutEditorPlacement.swift,
 				AppShortcuts/AppShortcutList.swift,
 				FirstRun/FirstRunStatus.swift,
 				HiddenApps/HiddenAppList.swift,

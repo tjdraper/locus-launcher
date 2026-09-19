@@ -6,7 +6,7 @@ struct AppShortcutsView: View {
     let store: AppShortcutStore
     let appIndex: AppIndexStore
     let appIcons: AppIconCache
-    let shortcutEditor: AppShortcutEditorWindowPresenter
+    let onEdit: (_ appID: String, _ appName: String) -> Void
 
     var body: some View {
         Group {
@@ -25,7 +25,7 @@ struct AppShortcutsView: View {
                             installedApp: installedApps[app.id],
                             clashingIDs: clashingIDs,
                             appIcons: appIcons,
-                            onEdit: { shortcutEditor.show(appID: app.id, appName: app.name) },
+                            onEdit: { onEdit(app.id, app.name) },
                             onRemove: { store.removeAll(forAppID: app.id) }
                         )
                     }

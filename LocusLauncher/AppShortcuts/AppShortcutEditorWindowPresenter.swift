@@ -1,7 +1,8 @@
 import AppKit
 import SwiftUI
 
-/// Shows the Manage Hot Keys window, one app at a time.
+/// Shows the Manage Hot Keys window, one app at a time. It opens over whatever opened it and
+/// doesn't remember where it was, since it belongs to that window or panel.
 final class AppShortcutEditorWindowPresenter: NSObject, NSWindowDelegate {
     private let store: AppShortcutStore
     private let appIndex: AppIndexStore
@@ -26,14 +27,15 @@ final class AppShortcutEditorWindowPresenter: NSObject, NSWindowDelegate {
     }
 
     /// Starts an app with no hot keys off with an empty one, ready to record.
-    func show(_ app: IndexedApp) {
+    func show(_ app: IndexedApp, over anchor: NSRect) {
         if store.list.entries(forAppID: app.persistentID).isEmpty {
             store.add(for: app)
         }
-        show(appID: app.persistentID, appName: app.name)
+        show(appID: app.persistentID, appName: app.name, over: anchor)
     }
 
-    func show(appID: String, appName: String) {
+    /// The anchor is in screen coordinates.
+    func show(appID: String, appName: String, over anchor: NSRect) {
         if let shownAppID, shownAppID != appID {
             store.removeUnrecorded(forAppID: shownAppID)
         }
@@ -48,7 +50,7 @@ final class AppShortcutEditorWindowPresenter: NSObject, NSWindowDelegate {
         ))
         window.title = "\(appName) Hot Keys"
         if !window.isVisible {
-            window.center()
+            place(over: anchor)
         }
         dockIcon.windowWillShow(window)
         AppActivation.bringToFront()
@@ -61,6 +63,13 @@ final class AppShortcutEditorWindowPresenter: NSObject, NSWindowDelegate {
         }
         shownAppID = nil
         dockIcon.windowWillClose(window)
+    }
+
+    private func place(over anchor: NSRect) {
+        guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(anchor) }) ?? NSScreen.main else { return }
+        window.layoutIfNeeded()
+        let placement = AppShortcutEditorPlacement(anchor: anchor, visibleScreenFrame: screen.visibleFrame)
+        window.setFrameOrigin(placement.origin(for: window.frame.size))
     }
 
     private func makeWindow() -> NSWindow {

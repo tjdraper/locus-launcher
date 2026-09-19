@@ -30,22 +30,12 @@ final class FirstRunWindowPresenter: NSObject, NSWindowDelegate {
     func show() {
         updates.defaultToAutomaticChecks()
         dockIcon.windowWillShow(window)
-        centerOnPrimaryDisplay()
         AppActivation.bringToFront()
         window.makeKeyAndOrderFront(nil)
     }
 
     func windowWillClose(_: Notification) {
         dockIcon.windowWillClose(window)
-    }
-
-    /// `NSWindow.center()` runs before SwiftUI has sized the window, so it lands off center.
-    private func centerOnPrimaryDisplay() {
-        guard let screen = NSScreen.screens.first else { return }
-        window.layoutIfNeeded()
-        let visible = screen.visibleFrame
-        let size = window.frame.size
-        window.setFrameOrigin(NSPoint(x: visible.midX - size.width / 2, y: visible.midY - size.height / 2))
     }
 
     private func makeWindow() -> NSWindow {
@@ -68,6 +58,7 @@ final class FirstRunWindowPresenter: NSObject, NSWindowDelegate {
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
         window.delegate = self
+        RememberedWindowPlacement(autosaveName: "Setup").apply(to: window)
         return window
     }
 }

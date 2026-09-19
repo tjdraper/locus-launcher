@@ -157,7 +157,7 @@ final class LauncherPanelPresenter {
             dismissAndEndSession()
         case .manageShortcuts:
             dismiss()
-            shortcutEditor.show(app)
+            shortcutEditor.show(app, over: panel.frame)
         case .hide:
             hiddenApps.hide(app)
         }

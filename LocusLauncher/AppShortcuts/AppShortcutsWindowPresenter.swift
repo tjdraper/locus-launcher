@@ -35,14 +35,16 @@ final class AppShortcutsWindowPresenter: NSObject, NSWindowDelegate {
 
     private func makeWindow() -> NSWindow {
         let window = NSWindow(contentViewController: NSHostingController(
-            rootView: AppShortcutsView(store: store, appIndex: appIndex, appIcons: appIcons, shortcutEditor: shortcutEditor)
+            rootView: AppShortcutsView(store: store, appIndex: appIndex, appIcons: appIcons) { [weak self] appID, appName in
+                guard let self else { return }
+                shortcutEditor.show(appID: appID, appName: appName, over: window.convertToScreen(window.contentLayoutRect))
+            }
         ))
         window.title = "Locus Launcher App Hot Keys"
         window.styleMask = [.titled, .closable, .resizable]
         window.isReleasedWhenClosed = false
         window.delegate = self
-        window.center()
-        window.setFrameAutosaveName("AppHotKeys")
+        RememberedWindowPlacement(autosaveName: "AppHotKeys").apply(to: window)
         return window
     }
 }

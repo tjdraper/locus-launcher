@@ -1,0 +1,33 @@
+import AppKit
+
+/// Opens a window centered on the primary display the first time, then where the user last left it.
+struct RememberedWindowPlacement {
+    let autosaveName: NSWindow.FrameAutosaveName
+
+    /// Call once, before the window is first shown.
+    func apply(to window: NSWindow) {
+        // `NSWindow.center()` runs before SwiftUI has sized the window, so it lands off center.
+        window.layoutIfNeeded()
+        let fittedSize = window.frame.size
+        let restored = window.setFrameUsingName(autosaveName)
+        window.setFrameAutosaveName(autosaveName)
+
+        if !restored {
+            centerOnPrimaryDisplay(window, size: fittedSize)
+        } else if !window.styleMask.contains(.resizable) {
+            // A fixed-size window takes its size from its content, which can change between
+            // versions, so only the saved position carries over.
+            let top = window.frame.maxY
+            window.setFrame(
+                NSRect(x: window.frame.minX, y: top - fittedSize.height, width: fittedSize.width, height: fittedSize.height),
+                display: false
+            )
+        }
+    }
+
+    private func centerOnPrimaryDisplay(_ window: NSWindow, size: NSSize) {
+        guard let screen = NSScreen.screens.first else { return }
+        let visible = screen.visibleFrame
+        window.setFrameOrigin(NSPoint(x: visible.midX - size.width / 2, y: visible.midY - size.height / 2))
+    }
+}

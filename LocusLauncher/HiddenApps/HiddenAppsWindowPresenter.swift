@@ -33,8 +33,7 @@ final class HiddenAppsWindowPresenter: NSObject, NSWindowDelegate {
         window.styleMask = [.titled, .closable, .resizable]
         window.isReleasedWhenClosed = false
         window.delegate = self
-        window.center()
-        window.setFrameAutosaveName("HiddenApps")
+        RememberedWindowPlacement(autosaveName: "HiddenApps").apply(to: window)
         return window
     }
 }

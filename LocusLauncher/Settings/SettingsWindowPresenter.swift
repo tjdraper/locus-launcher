@@ -62,7 +62,7 @@ final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
         window.delegate = self
-        window.center()
+        RememberedWindowPlacement(autosaveName: "Settings").apply(to: window)
         return window
     }
 }
