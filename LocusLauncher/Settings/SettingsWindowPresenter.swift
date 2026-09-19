@@ -36,6 +36,9 @@ final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
         dockIcon.windowWillShow(window)
         AppActivation.bringToFront()
         window.makeKeyAndOrderFront(nil)
+        // AppKit otherwise focuses the first key view, the launcher shortcut recorder, which starts
+        // recording on focus and swallows the next keystroke as a new shortcut.
+        window.makeFirstResponder(nil)
     }
 
     func windowWillClose(_: Notification) {
