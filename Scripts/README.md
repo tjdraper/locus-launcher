@@ -47,6 +47,10 @@ A beta cannot be promoted in place, because `CFBundleVersion` is the version: `2
 
 Xcode → Settings → Accounts → your Apple ID → Manage Certificates → **+** → Developer ID Application. Only the account holder can create one.
 
+### Developer ID provisioning profile
+
+iCloud sync needs the iCloud key-value storage entitlement, and a Developer ID build can only carry it with a Developer ID provisioning profile. `xcodebuild` on the command line can't create one when it has no access to the Xcode account ("No Accounts"), so let Xcode create it once: Product → Archive, then Distribute App → Direct Distribution. After that, the export in `release.sh` finds the profile Xcode keeps.
+
 ### Notarization credentials
 
 Create an App Store Connect API key (App Store Connect → Users and Access → Integrations → Team Keys) with the Developer role, download the `.p8`, then:

@@ -17,11 +17,13 @@ struct AppShortcutsView: View {
                     Text("To add a hot key, select an app in the launcher and press Tab, or press ⌘K.")
                 }
             } else {
+                let clashingIDs = clashingIDs
                 Form {
                     ForEach(apps) { app in
                         AppShortcutsRow(
                             app: app,
                             installedApp: installedApps[app.id],
+                            clashingIDs: clashingIDs,
                             appIcons: appIcons,
                             onEdit: { shortcutEditor.show(appID: app.id, appName: app.name) },
                             onRemove: { store.removeAll(forAppID: app.id) }
@@ -45,6 +47,12 @@ struct AppShortcutsView: View {
     private var installedApps: [String: IndexedApp] {
         Dictionary(appIndex.apps.map { ($0.persistentID, $0) }) { first, _ in first }
     }
+
+    private var clashingIDs: Set<AppShortcutList.Entry.ID> {
+        let installedAppIDs = Set(installedApps.keys)
+        let check = AppShortcutConflictCheck(store: store)
+        return Set(store.list.entries.filter { check.clash(for: $0, installedAppIDs: installedAppIDs) != nil }.map(\.id))
+    }
 }
 
 private struct AppWithShortcuts: Identifiable {
@@ -56,6 +64,7 @@ private struct AppWithShortcuts: Identifiable {
 private struct AppShortcutsRow: View {
     let app: AppWithShortcuts
     let installedApp: IndexedApp?
+    let clashingIDs: Set<AppShortcutList.Entry.ID>
     let appIcons: AppIconCache
     let onEdit: () -> Void
     let onRemove: () -> Void
@@ -82,7 +91,10 @@ private struct AppShortcutsRow: View {
 
     private var summary: String {
         app.entries.compactMap { entry in
-            entry.keys.map { "\($0.symbols) \(entry.action.title)" }
+            entry.keys.map { keys in
+                let summary = "\(keys.symbols) \(entry.action.title)"
+                return clashingIDs.contains(entry.id) ? "\(summary) (keys in use)" : summary
+            }
         }
         .joined(separator: ", ")
     }

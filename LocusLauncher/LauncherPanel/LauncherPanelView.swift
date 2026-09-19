@@ -31,7 +31,7 @@ struct LauncherPanelView: View {
 
             Divider()
 
-            AppBrowseView(list: list, shortcutLabels: AppShortcutRowLabels.make(from: appShortcuts.list), controller: browse)
+            AppBrowseView(list: list, shortcutLabels: shortcutLabels, controller: browse)
                 .overlay {
                     if list.rows.isEmpty, !search.query.isEmpty {
                         Text("No Matching Apps")
@@ -48,6 +48,10 @@ struct LauncherPanelView: View {
                 isSearchFocused = true
             }
         }
+    }
+
+    private var shortcutLabels: [String: String] {
+        AppShortcutRowLabels.make(from: appShortcuts.list, installedAppIDs: Set(appIndex.apps.map(\.persistentID)))
     }
 
     private var list: BrowseList {

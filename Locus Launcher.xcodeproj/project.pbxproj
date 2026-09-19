@@ -42,6 +42,7 @@
 				AppSearch/LaunchHistory.swift,
 				AppShortcuts/AppShortcutList.swift,
 				HiddenApps/HiddenAppList.swift,
+				ICloudSync/SyncMerge.swift,
 				SpotlightShortcut/SpotlightHotKeys.swift,
 			);
 			target = 32159301305C3F46009DC298 /* Locus Launcher Tests */;
@@ -359,6 +360,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Locus Launcher";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LocusLauncher/SupportingFiles/LocusLauncher.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2026.0.11;
@@ -391,6 +393,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "Locus Launcher";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = LocusLauncher/SupportingFiles/LocusLauncher.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 2026.0.11;

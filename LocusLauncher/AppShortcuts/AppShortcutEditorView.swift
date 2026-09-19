@@ -14,7 +14,11 @@ struct AppShortcutEditorView: View {
         Form {
             Section {
                 ForEach(entries) { entry in
-                    AppShortcutRow(entry: entry, store: store)
+                    AppShortcutRow(
+                        entry: entry,
+                        clash: AppShortcutConflictCheck(store: store).clash(for: entry, installedAppIDs: installedAppIDs),
+                        store: store
+                    )
                 }
             } header: {
                 HStack(spacing: 12) {
@@ -62,10 +66,16 @@ struct AppShortcutEditorView: View {
     private var installedApp: IndexedApp? {
         appIndex.apps.first { $0.persistentID == appID }
     }
+
+    private var installedAppIDs: Set<String> {
+        Set(appIndex.apps.map(\.persistentID))
+    }
 }
 
 private struct AppShortcutRow: View {
     let entry: AppShortcutList.Entry
+    /// Set when a hot key synced from another Mac brought keys this Mac already uses.
+    let clash: AppShortcutConflictCheck.Conflict?
     let store: AppShortcutStore
 
     /// The entry keeps no keys while its recorder shows rejected ones.
@@ -78,7 +88,12 @@ private struct AppShortcutRow: View {
                 controls
             }
             if let rejected {
-                ShortcutConflictNote(reason: rejected.conflict.reason, onUseHere: useHereAction(for: rejected))
+                ShortcutConflictNote(
+                    reason: rejected.conflict.reason,
+                    onUseHere: useHereAction(for: rejected.conflict, keys: AppShortcutList.Keys(rejected.shortcut))
+                )
+            } else if let clash, let keys = entry.keys {
+                ShortcutConflictNote(reason: clash.reason, onUseHere: useHereAction(for: clash, keys: keys))
             } else if entry.keys?.shortcut.isTakenBySystem == true {
                 SystemShortcutNote()
             }
@@ -93,15 +108,15 @@ private struct AppShortcutRow: View {
             onChange: record
         )
         .fixedSize()
-        .rejectedShortcutOutline(rejected != nil)
+        .rejectedShortcutOutline(rejected != nil || clash != nil)
     }
 
     /// The launcher's shortcut isn't offered, since taking it would leave the launcher with none.
-    private func useHereAction(for rejected: RejectedShortcut) -> (() -> Void)? {
-        guard case .appShortcut = rejected.conflict else { return nil }
+    private func useHereAction(for conflict: AppShortcutConflictCheck.Conflict, keys: AppShortcutList.Keys) -> (() -> Void)? {
+        guard case .appShortcut = conflict else { return nil }
         return {
             self.rejected = nil
-            store.takeKeys(AppShortcutList.Keys(rejected.shortcut), for: entry.id)
+            store.takeKeys(keys, for: entry.id)
         }
     }
 

@@ -15,7 +15,11 @@ nonisolated struct HiddenAppList: Codable, Equatable, Sendable {
         }
     }
 
-    private(set) var entries: [Entry] = []
+    private(set) var entries: [Entry]
+
+    init(entries: [Entry] = []) {
+        self.entries = entries
+    }
 
     mutating func hide(_ app: IndexedApp) {
         let id = app.persistentID
@@ -37,5 +41,19 @@ nonisolated struct HiddenAppList: Codable, Equatable, Sendable {
         guard !entries.isEmpty else { return apps }
         let hidden = Set(entries.map(\.id))
         return apps.filter { !hidden.contains($0.persistentID) }
+    }
+}
+
+nonisolated extension HiddenAppList.Entry: SyncableEntry {
+    var syncID: String {
+        id
+    }
+
+    var isSynced: Bool {
+        syncsToOtherMacs && canSync
+    }
+
+    var isReadyToSync: Bool {
+        true
     }
 }

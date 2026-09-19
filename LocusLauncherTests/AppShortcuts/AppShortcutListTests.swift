@@ -140,4 +140,64 @@ struct AppShortcutListTests {
         #expect(list.entries.map(\.syncsToOtherMacs) == [false, false])
         #expect(list.entries.map(\.canSync) == [true, false])
     }
+
+    @Test
+    func letsTheEarlierHotKeyKeepKeysASyncedOneAlsoUses() {
+        // Arrange
+        let mine = entry(for: safari, keys: keysS)
+        let synced = entry(for: mailApp, keys: keysS)
+        let list = AppShortcutList(entries: [mine, synced])
+
+        // Act
+        let working = list.workingEntries(installedAppIDs: [safari.persistentID, mailApp.persistentID])
+
+        // Assert
+        #expect(working == [keysS: mine])
+    }
+
+    @Test
+    func givesNoKeysToAppsNotOnThisMac() {
+        // Arrange
+        let missing = entry(for: mailApp, keys: keysS)
+        let mine = entry(for: safari, keys: keysS)
+        let list = AppShortcutList(entries: [missing, mine])
+
+        // Act
+        let working = list.workingEntries(installedAppIDs: [safari.persistentID])
+
+        // Assert
+        #expect(working == [keysS: mine])
+    }
+
+    @Test
+    func takesKeysFromEveryHotKeyThatHasThem() {
+        // Arrange
+        let first = entry(for: tool, keys: keysS)
+        let second = entry(for: mailApp, keys: keysS)
+        let sameApp = entry(for: safari, keys: keysS)
+        let taker = entry(for: safari, keys: keysW)
+        var list = AppShortcutList(entries: [first, second, sameApp, taker])
+
+        // Act
+        list.takeKeys(keysS, for: taker.id)
+
+        // Assert
+        #expect(list.entries.map(\.id) == [sameApp.id, taker.id])
+        #expect(list.entries.map(\.keys) == [nil, keysS])
+    }
+
+    private var mailApp: IndexedApp {
+        IndexedApp(url: URL(fileURLWithPath: "/System/Applications/Mail.app"), name: "Mail", bundleIdentifier: "com.apple.mail")
+    }
+
+    private func entry(for app: IndexedApp, keys: AppShortcutList.Keys) -> AppShortcutList.Entry {
+        AppShortcutList.Entry(
+            id: UUID(),
+            appID: app.persistentID,
+            appName: app.name,
+            keys: keys,
+            action: .open,
+            syncsToOtherMacs: app.bundleIdentifier != nil
+        )
+    }
 }

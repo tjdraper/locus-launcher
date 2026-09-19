@@ -38,7 +38,11 @@ nonisolated struct AppShortcutList: Codable, Equatable, Sendable {
         }
     }
 
-    private(set) var entries: [Entry] = []
+    private(set) var entries: [Entry]
+
+    init(entries: [Entry] = []) {
+        self.entries = entries
+    }
 
     /// In the order they were added.
     func entries(forAppID appID: String) -> [Entry] {
@@ -52,6 +56,19 @@ nonisolated struct AppShortcutList: Codable, Equatable, Sendable {
 
     func entry(using keys: Keys, except id: UUID? = nil) -> Entry? {
         entries.first { $0.keys == keys && $0.id != id }
+    }
+
+    /// The entry each combination runs on this Mac. Synced entries can bring keys this Mac
+    /// already uses, and the entry that had them first keeps them. Apps that aren't on this Mac
+    /// get no keys, so a hot key synced for them doesn't take keys from other apps here.
+    func workingEntries(installedAppIDs: Set<String>) -> [Keys: Entry] {
+        var working: [Keys: Entry] = [:]
+        for entry in entries where installedAppIDs.contains(entry.appID) {
+            if let keys = entry.keys, working[keys] == nil {
+                working[keys] = entry
+            }
+        }
+        return working
     }
 
     @discardableResult
@@ -83,17 +100,14 @@ nonisolated struct AppShortcutList: Codable, Equatable, Sendable {
         entries[index].keys = keys
     }
 
-    /// Gives the keys to this entry and takes them from the entry that had them. That entry is
-    /// removed when it belongs to another app, since nothing shows it there until its app's hot
-    /// keys are opened.
+    /// Gives the keys to this entry and takes them from every entry that had them. Synced entries
+    /// can leave more than one. An entry is removed when it belongs to another app, since nothing
+    /// shows it there until its app's hot keys are opened.
     mutating func takeKeys(_ keys: Keys, for id: UUID) {
         guard let appID = entries.first(where: { $0.id == id })?.appID else { return }
-        if let previous = entries.firstIndex(where: { $0.keys == keys && $0.id != id }) {
-            if entries[previous].appID == appID {
-                entries[previous].keys = nil
-            } else {
-                entries.remove(at: previous)
-            }
+        entries.removeAll { $0.keys == keys && $0.id != id && $0.appID != appID }
+        for index in entries.indices where entries[index].keys == keys && entries[index].id != id {
+            entries[index].keys = nil
         }
         if let index = entries.firstIndex(where: { $0.id == id }) {
             entries[index].keys = keys
@@ -122,5 +136,20 @@ nonisolated struct AppShortcutList: Codable, Equatable, Sendable {
     /// Drops entries the user added but never recorded keys for.
     mutating func removeUnrecorded(forAppID appID: String) {
         entries.removeAll { $0.appID == appID && $0.keys == nil }
+    }
+}
+
+nonisolated extension AppShortcutList.Entry: SyncableEntry {
+    var syncID: String {
+        id.uuidString
+    }
+
+    var isSynced: Bool {
+        syncsToOtherMacs && canSync
+    }
+
+    /// A hot key waiting for its keys does nothing yet, so other Macs don't get it until it does.
+    var isReadyToSync: Bool {
+        keys != nil
     }
 }

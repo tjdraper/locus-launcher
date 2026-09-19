@@ -31,4 +31,8 @@ final class HiddenAppsStore {
     func setSyncsToOtherMacs(_ syncs: Bool, for id: String) {
         list.setSyncsToOtherMacs(syncs, for: id)
     }
+
+    func replaceEntries(_ entries: [HiddenAppList.Entry]) {
+        list = HiddenAppList(entries: entries)
+    }
 }

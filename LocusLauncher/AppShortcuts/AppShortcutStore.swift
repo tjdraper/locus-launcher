@@ -55,4 +55,8 @@ final class AppShortcutStore {
     func removeUnrecorded(forAppID appID: String) {
         list.removeUnrecorded(forAppID: appID)
     }
+
+    func replaceEntries(_ entries: [AppShortcutList.Entry]) {
+        list = AppShortcutList(entries: entries)
+    }
 }

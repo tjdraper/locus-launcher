@@ -50,8 +50,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     )
     lazy var shortcutListener = AppShortcutListener(
         store: appShortcuts,
+        appIndex: appIndex,
         runner: AppShortcutRunner(appIndex: appIndex, newWindowOpener: newWindowOpener)
     )
+    lazy var iCloudSync = ICloudSyncCoordinator(appShortcuts: appShortcuts, hiddenApps: hiddenApps)
 
     func applicationDidFinishLaunching(_: Notification) {
         // A move relaunches the app, so nothing below should start before the offer is settled.
@@ -62,6 +64,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyDown(for: .toggleLauncher) { [weak self] in
             self?.launcherPanel.toggle()
         }
+        iCloudSync.start()
         shortcutListener.start()
         Task {
             await SpotlightConflictLaunchCheck().run()
