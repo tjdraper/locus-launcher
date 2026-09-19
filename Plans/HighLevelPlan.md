@@ -115,6 +115,8 @@
 
 - **More result actions:** quit a running app, and other actions beyond slice 8's menu. Not in v1.
 
+- **Apps not on this Mac in App Hot Keys:** move apps that aren't installed on this Mac into their own area at the bottom of the App Hot Keys window, collapsed by default. Synced hot keys (slice 10) will bring in apps from other Macs, and they shouldn't crowd out the apps this Mac has. Not in v1.
+
 ## Public repo
 
 The GitHub repo will be public, and it will host the release zips and the Sparkle appcast.
