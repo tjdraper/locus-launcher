@@ -35,10 +35,7 @@ final class FirstRunWindowPresenter: NSObject, NSWindowDelegate {
         window.makeKeyAndOrderFront(nil)
     }
 
-    /// Closing the window any way counts as finishing, since the checklist can be reopened. Quitting
-    /// with it open doesn't close it, so it opens again on the next launch.
     func windowWillClose(_: Notification) {
-        FirstRunStatus().markCompleted()
         dockIcon.windowWillClose(window)
     }
 
@@ -59,7 +56,10 @@ final class FirstRunWindowPresenter: NSObject, NSWindowDelegate {
                 spotlight: spotlight,
                 accessibilityAccess: accessibilityAccess,
                 appShortcuts: appShortcuts,
+                // Only Done finishes the first run. Closing the window or quitting, including the
+                // relaunch after moving to Applications, brings the checklist back next launch.
                 onDone: { [weak self] in
+                    FirstRunStatus().markCompleted()
                     self?.window.close()
                 }
             )

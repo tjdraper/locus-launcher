@@ -32,7 +32,7 @@ struct ApplicationsFolderMover {
         }
 
         clearQuarantine(at: destination)
-        NSWorkspace.shared.recycle([location.originalURL], completionHandler: nil)
+        trashOriginal()
         relaunch(from: destination)
     }
 
@@ -56,6 +56,13 @@ struct ApplicationsFolderMover {
     /// new copy translocated too. Failing to clear it is not worth aborting the move over.
     private func clearQuarantine(at destination: URL) {
         try? (destination as NSURL).setResourceValue(nil, forKey: .quarantinePropertiesKey)
+    }
+
+    /// `NSWorkspace.recycle` finishes in the background, and the app quits before it gets there,
+    /// which leaves the original behind. The copy in Applications is already in place, so a
+    /// leftover original is not worth aborting the move over.
+    private func trashOriginal() {
+        try? FileManager.default.trashItem(at: location.originalURL, resultingItemURL: nil)
     }
 
     private func relaunch(from destination: URL) {
