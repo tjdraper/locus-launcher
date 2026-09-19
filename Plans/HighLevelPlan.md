@@ -118,6 +118,10 @@
 
 - **Apps not on this Mac in App Hot Keys:** move apps that aren't installed on this Mac into their own area at the bottom of the App Hot Keys window, collapsed by default. Synced hot keys (slice 10) will bring in apps from other Macs, and they shouldn't crowd out the apps this Mac has. Not in v1.
 
+- **Sync status in App Hot Keys:** show in each row of the App Hot Keys window whether the app's hot keys sync through iCloud. Sync is chosen per hot key, so an app can have some that sync and some that don't, and the row needs a way to show that. Not in v1.
+
+- **Right-click for the actions menu:** right-clicking an app in the launcher panel selects it and opens its actions menu, the same as Tab or clicking the caret. Not in v1.
+
 ## Public repo
 
 The GitHub repo will be public, and it will host the release zips and the Sparkle appcast.
