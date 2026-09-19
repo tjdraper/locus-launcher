@@ -27,6 +27,13 @@ struct LauncherShortcutRow: View {
                 SystemShortcutNote()
             }
         }
+        .task {
+            // Settings and the setup checklist both record this shortcut, and either window can
+            // stay open while the other changes it.
+            for await _ in NotificationCenter.default.notifications(named: NSWindow.didBecomeKeyNotification) where rejected == nil {
+                shortcut = KeyboardShortcuts.getShortcut(for: .toggleLauncher)
+            }
+        }
     }
 
     private func record(_ newShortcut: KeyboardShortcuts.Shortcut?) {

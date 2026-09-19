@@ -11,6 +11,7 @@ struct LocusLauncherApp: App {
                 settings: appDelegate.settings,
                 appShortcutsWindow: appDelegate.appShortcutsWindow,
                 hiddenAppsWindow: appDelegate.hiddenAppsWindow,
+                firstRunWindow: appDelegate.firstRunWindow,
                 updates: appDelegate.updates
             )
         } label: {

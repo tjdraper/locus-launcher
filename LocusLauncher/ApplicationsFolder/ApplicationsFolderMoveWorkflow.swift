@@ -7,7 +7,16 @@ import AppKit
 struct ApplicationsFolderMoveWorkflow {
     private static let declinedDefaultsKey = "DeclinedMoveToApplicationsFolder"
 
-    private let location = AppBundleLocation.current()
+    /// Debug builds run from DerivedData, so the move would be offered on every launch.
+    static var isAvailable: Bool {
+        #if DEBUG
+        false
+        #else
+        true
+        #endif
+    }
+
+    let location = AppBundleLocation.current()
 
     func offerIfNeeded() {
         guard shouldOffer else { return }
@@ -18,6 +27,10 @@ struct ApplicationsFolderMoveWorkflow {
             return
         }
 
+        move()
+    }
+
+    func move() {
         do {
             try ApplicationsFolderMover(location: location).moveAndRelaunch()
         } catch {
@@ -26,13 +39,9 @@ struct ApplicationsFolderMoveWorkflow {
     }
 
     private var shouldOffer: Bool {
-        #if DEBUG
-        // Debug builds run from DerivedData, so the prompt would fire on every launch.
-        false
-        #else
-        !location.isInApplicationsFolder
+        Self.isAvailable
+            && !location.isInApplicationsFolder
             && !UserDefaults.standard.bool(forKey: Self.declinedDefaultsKey)
-        #endif
     }
 
     private func askToMove() -> Bool {

@@ -41,6 +41,7 @@
 				AppSearch/FuzzyMatcher.swift,
 				AppSearch/LaunchHistory.swift,
 				AppShortcuts/AppShortcutList.swift,
+				FirstRun/FirstRunStatus.swift,
 				HiddenApps/HiddenAppList.swift,
 				ICloudSync/SyncMerge.swift,
 				SpotlightShortcut/SpotlightHotKeys.swift,

@@ -78,12 +78,13 @@
     - Handle a synced shortcut for an app that isn't installed on the other Mac
 
 11. **First-run wizard**
-    - Step-by-step setup shown on first launch, and reopenable later
+    - A one-page setup checklist shown on first launch, and reopenable from the menu bar menu and Settings
+    - Only fresh installs see it at launch. Installs from before this slice are recognized by Sparkle's launched-before flag and skip it.
     - Move to `/Applications` if needed
     - Choose the launcher hotkey, and turn off Spotlight's shortcut if Cmd+Space is chosen
     - Grant Accessibility permission, with an explanation of what it enables (opening new windows) and a way to skip it
     - Launch at login
-    - Ask about automatic update checks here. Sparkle otherwise raises its own permission prompt on the second launch, which for a menu bar app that starts at login lands at an arbitrary moment. Take it over with `SPUUpdaterDelegate.updaterShouldPromptForPermissionToCheckForUpdates`.
+    - Ask about automatic update checks here. Sparkle otherwise raises its own permission prompt on the second launch, which for a menu bar app that starts at login lands at an arbitrary moment. Take it over with `SPUUpdaterDelegate.updaterShouldPromptForPermissionToCheckForUpdates`. The checklist turns automatic checks on unless the user already chose, matching the default in Sparkle's prompt.
     - Each step reflects the real current state, so granting a permission in System Settings updates the wizard
 
 12. **Polish and first release**

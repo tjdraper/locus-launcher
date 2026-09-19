@@ -5,6 +5,7 @@ struct MenuBarMenu: View {
     let settings: SettingsWindowPresenter
     let appShortcutsWindow: AppShortcutsWindowPresenter
     let hiddenAppsWindow: HiddenAppsWindowPresenter
+    let firstRunWindow: FirstRunWindowPresenter
     let updates: UpdateController
 
     var body: some View {
@@ -26,6 +27,10 @@ struct MenuBarMenu: View {
             hiddenAppsWindow.show()
         }
         .keyboardShortcut("h", modifiers: [.command, .option, .control])
+
+        Button("Setup Checklist…") {
+            firstRunWindow.show()
+        }
 
         Divider()
 

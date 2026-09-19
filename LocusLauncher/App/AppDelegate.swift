@@ -8,12 +8,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let hiddenApps = HiddenAppsStore()
     let appShortcuts = AppShortcutStore()
     let accessibilityAccess = AccessibilityAccessStore()
+    let launchAtLogin = LaunchAtLoginStore()
+    let spotlight = SpotlightShortcutStore()
     let dockIcon = DockIconPresence()
     lazy var newWindowOpener = NewWindowOpener(access: accessibilityAccess)
+    lazy var firstRunWindow = FirstRunWindowPresenter(
+        updates: updates,
+        launchAtLogin: launchAtLogin,
+        spotlight: spotlight,
+        accessibilityAccess: accessibilityAccess,
+        appShortcuts: appShortcuts,
+        dockIcon: dockIcon
+    )
     lazy var settings = SettingsWindowPresenter(
         updates: updates,
         accessibilityAccess: accessibilityAccess,
         appShortcuts: appShortcuts,
+        launchAtLogin: launchAtLogin,
+        spotlight: spotlight,
+        firstRunWindow: firstRunWindow,
         dockIcon: dockIcon
     )
     lazy var hiddenAppsWindow = HiddenAppsWindowPresenter(
@@ -56,8 +69,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     lazy var iCloudSync = ICloudSyncCoordinator(appShortcuts: appShortcuts, hiddenApps: hiddenApps)
 
     func applicationDidFinishLaunching(_: Notification) {
+        // Settled before Sparkle starts, which marks every install as launched before.
+        let isFirstRun = FirstRunStatus().settleAtLaunch() == .pending
         // A move relaunches the app, so nothing below should start before the offer is settled.
-        ApplicationsFolderMoveWorkflow().offerIfNeeded()
+        // On a first run the setup checklist makes the offer instead.
+        if !isFirstRun {
+            ApplicationsFolderMoveWorkflow().offerIfNeeded()
+        }
         updates.start()
         appIndex.start()
         appIcons.start(observing: appIndex)
@@ -66,8 +84,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         iCloudSync.start()
         shortcutListener.start()
-        Task {
-            await SpotlightConflictLaunchCheck().run()
+        if isFirstRun {
+            firstRunWindow.show()
+        } else {
+            Task {
+                await SpotlightConflictLaunchCheck().run()
+            }
         }
     }
 
