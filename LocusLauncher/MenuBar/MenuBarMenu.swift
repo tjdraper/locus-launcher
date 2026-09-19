@@ -3,6 +3,7 @@ import SwiftUI
 struct MenuBarMenu: View {
     let launcherPanel: LauncherPanelPresenter
     let settings: SettingsWindowPresenter
+    let appShortcutsWindow: AppShortcutsWindowPresenter
     let hiddenAppsWindow: HiddenAppsWindowPresenter
     let updates: UpdateController
 
@@ -15,6 +16,11 @@ struct MenuBarMenu: View {
             settings.show()
         }
         .keyboardShortcut(",")
+
+        Button("App Hot Keys…") {
+            appShortcutsWindow.show()
+        }
+        .keyboardShortcut("k", modifiers: [.command, .option])
 
         Button("Hidden Apps…") {
             hiddenAppsWindow.show()

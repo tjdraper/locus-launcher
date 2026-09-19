@@ -7,6 +7,7 @@ struct SettingsView: View {
     let launchAtLogin: LaunchAtLoginStore
     let spotlight: SpotlightShortcutStore
     let accessibilityAccess: AccessibilityAccessStore
+    let appShortcuts: AppShortcutStore
 
     var body: some View {
         Form {
@@ -17,6 +18,10 @@ struct SettingsView: View {
             Section("Launcher") {
                 KeyboardShortcuts.Recorder("Launcher shortcut", name: .toggleLauncher) { _ in
                     spotlight.refresh()
+                }
+                .shortcutValidation { shortcut in
+                    AppShortcutConflictCheck(store: appShortcuts).conflict(for: shortcut, recording: .launcher)
+                        .map { .disallow(reason: $0.reason) } ?? .allow
                 }
                 // The only menu is this app's own, which exists while Settings is open. AppKit fills
                 // it with items like Emoji & Symbols, and a global hotkey fires before any menu sees
@@ -55,6 +60,7 @@ struct SettingsView: View {
         updates: UpdateController(),
         launchAtLogin: LaunchAtLoginStore(),
         spotlight: SpotlightShortcutStore(),
-        accessibilityAccess: AccessibilityAccessStore()
+        accessibilityAccess: AccessibilityAccessStore(),
+        appShortcuts: AppShortcutStore()
     )
 }

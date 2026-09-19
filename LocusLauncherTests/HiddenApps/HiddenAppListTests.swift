@@ -66,7 +66,7 @@ struct HiddenAppListTests {
         list.hide(tool)
 
         // Act
-        list.setSyncsToOtherMacs(true, for: HiddenAppList.id(of: tool))
+        list.setSyncsToOtherMacs(true, for: tool.persistentID)
 
         // Assert
         #expect(list.entries.first?.syncsToOtherMacs == false)
@@ -79,7 +79,7 @@ struct HiddenAppListTests {
         list.hide(safari)
 
         // Act
-        list.unhide(HiddenAppList.id(of: safari))
+        list.unhide(safari.persistentID)
 
         // Assert
         #expect(list.visibleApps(in: [safari]) == [safari])
@@ -90,7 +90,7 @@ struct HiddenAppListTests {
         // Arrange
         var list = HiddenAppList()
         list.hide(safari)
-        list.setSyncsToOtherMacs(false, for: HiddenAppList.id(of: safari))
+        list.setSyncsToOtherMacs(false, for: safari.persistentID)
 
         // Act
         list.hide(safari)

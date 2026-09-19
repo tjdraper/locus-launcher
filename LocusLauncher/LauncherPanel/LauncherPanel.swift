@@ -17,6 +17,7 @@ final class LauncherPanel: NSPanel {
     private let onDismiss: () -> Void
     private let onOpenSettings: () -> Void
     private let onOpenHiddenApps: () -> Void
+    private let onOpenAppShortcuts: () -> Void
     private let onKeyCommand: (KeyCommand) -> Void
 
     /// Sees each event first, and returns whether it used it up. The actions menu takes the
@@ -27,11 +28,13 @@ final class LauncherPanel: NSPanel {
         onDismiss: @escaping () -> Void,
         onOpenSettings: @escaping () -> Void,
         onOpenHiddenApps: @escaping () -> Void,
+        onOpenAppShortcuts: @escaping () -> Void,
         onKeyCommand: @escaping (KeyCommand) -> Void
     ) {
         self.onDismiss = onDismiss
         self.onOpenSettings = onOpenSettings
         self.onOpenHiddenApps = onOpenHiddenApps
+        self.onOpenAppShortcuts = onOpenAppShortcuts
         self.onKeyCommand = onKeyCommand
         super.init(
             contentRect: NSRect(origin: .zero, size: Self.size),
@@ -91,7 +94,11 @@ final class LauncherPanel: NSPanel {
     }
 
     private func keyCommand(for event: NSEvent) -> KeyCommand? {
-        if let action = AppAction(keyCode: event.keyCode, modifierFlags: event.modifierFlags) {
+        if let action = AppAction(
+            keyCode: event.keyCode,
+            characters: event.charactersIgnoringModifiers,
+            modifierFlags: event.modifierFlags
+        ) {
             return .perform(action)
         }
         guard event.modifierFlags.isDisjoint(with: [.command, .option, .control, .shift]) else {
@@ -114,6 +121,10 @@ final class LauncherPanel: NSPanel {
         // Cmd+Option+H is left alone, since it's the system's Hide Others.
         if modifiers == [.command, .option, .control], event.charactersIgnoringModifiers?.lowercased() == "h" {
             onOpenHiddenApps()
+            return true
+        }
+        if modifiers == [.command, .option], event.charactersIgnoringModifiers?.lowercased() == "k" {
+            onOpenAppShortcuts()
             return true
         }
         return super.performKeyEquivalent(with: event)

@@ -9,6 +9,7 @@ struct LocusLauncherApp: App {
             MenuBarMenu(
                 launcherPanel: appDelegate.launcherPanel,
                 settings: appDelegate.settings,
+                appShortcutsWindow: appDelegate.appShortcutsWindow,
                 hiddenAppsWindow: appDelegate.hiddenAppsWindow,
                 updates: appDelegate.updates
             )

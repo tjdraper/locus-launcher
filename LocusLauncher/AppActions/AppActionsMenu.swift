@@ -67,13 +67,17 @@ final class AppActionsMenu {
         default:
             break
         }
-        if AppAction.key(forKeyCode: event.keyCode) == .returnKey, modifiers.isEmpty {
+        if AppAction.key(forKeyCode: event.keyCode, characters: nil) == .returnKey, modifiers.isEmpty {
             if let action = menuView.highlighted {
                 onChoose(action)
             }
             return .handled
         }
-        if let action = AppAction(keyCode: event.keyCode, modifierFlags: event.modifierFlags) {
+        if let action = AppAction(
+            keyCode: event.keyCode,
+            characters: event.charactersIgnoringModifiers,
+            modifierFlags: event.modifierFlags
+        ) {
             onChoose(action)
             return .handled
         }

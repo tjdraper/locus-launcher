@@ -7,6 +7,7 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
     private let icons: AppIconCache
     private let onAction: (AppAction, IndexedApp) -> Void
     private var list = BrowseList(apps: [])
+    private var shortcutLabels: [String: String] = [:]
     private weak var tableView: AppBrowseTableView?
     private var actionsMenu: AppActionsMenu?
     private weak var actionsMenuCell: AppBrowseCellView?
@@ -52,8 +53,16 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
     /// Keeps the selected app selected while the browse list updates, and when the selected app is
     /// hidden, moves to the app that took its place. Anything else, including each new set of
     /// search results, starts from the first app.
-    func show(_ newList: BrowseList) {
-        guard newList != list, let tableView else { return }
+    /// `shortcutLabels` is keyed by each app's `persistentID`.
+    func show(_ newList: BrowseList, shortcutLabels newLabels: [String: String]) {
+        guard let tableView else { return }
+        if newLabels != shortcutLabels {
+            shortcutLabels = newLabels
+            if newList == list {
+                tableView.reloadData(forRowIndexes: IndexSet(integersIn: 0 ..< list.rows.count), columnIndexes: [0])
+            }
+        }
+        guard newList != list else { return }
 
         let previous = list
         let selected = previous.app(at: tableView.selectedRow)
@@ -246,10 +255,11 @@ final class AppBrowseTableController: NSObject, NSTableViewDataSource, NSTableVi
         case let .app(app):
             let view = tableView.makeView(withIdentifier: AppBrowseCellView.identifier, owner: nil) as? AppBrowseCellView
                 ?? AppBrowseCellView()
+            let shortcuts = shortcutLabels[app.persistentID]
             if let icon = icons.cachedIcon(for: app) {
-                view.show(app, icon: icon, reservesLetterIndex: list.hasSections)
+                view.show(app, icon: icon, shortcuts: shortcuts, reservesLetterIndex: list.hasSections)
             } else {
-                view.show(app, icon: icons.placeholder, reservesLetterIndex: list.hasSections)
+                view.show(app, icon: icons.placeholder, shortcuts: shortcuts, reservesLetterIndex: list.hasSections)
                 Task { [icons] in
                     let icon = await icons.icon(for: app)
                     if view.appURL == app.url {

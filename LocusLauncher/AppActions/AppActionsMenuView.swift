@@ -17,7 +17,7 @@ final class AppActionsMenuView: NSView {
     }
 
     private static let entries: [Entry] = AppAction.allCases.flatMap { action -> [Entry] in
-        action == .hide ? [.separator, .item(action)] : [.item(action)]
+        action == .manageShortcuts || action == .hide ? [.separator, .item(action)] : [.item(action)]
     }
 
     private static let font = NSFont.menuFont(ofSize: 0)

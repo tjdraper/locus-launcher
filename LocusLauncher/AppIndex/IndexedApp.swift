@@ -12,4 +12,10 @@ nonisolated struct IndexedApp: Identifiable, Hashable, Sendable {
     var id: URL {
         url
     }
+
+    /// The bundle identifier, so settings stored for an app match the same app on another Mac and
+    /// wherever it's moved on this one. Apps without one fall back to their path.
+    var persistentID: String {
+        bundleIdentifier?.lowercased() ?? url.path
+    }
 }

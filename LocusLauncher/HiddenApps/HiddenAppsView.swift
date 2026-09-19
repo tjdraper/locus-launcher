@@ -35,7 +35,7 @@ struct HiddenAppsView: View {
     }
 
     private var installedApps: [String: IndexedApp] {
-        Dictionary(appIndex.apps.map { (HiddenAppList.id(of: $0), $0) }) { first, _ in first }
+        Dictionary(appIndex.apps.map { ($0.persistentID, $0) }) { first, _ in first }
     }
 }
 

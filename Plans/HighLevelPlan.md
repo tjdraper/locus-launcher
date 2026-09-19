@@ -63,8 +63,13 @@
 9. **Per-app shortcuts**
    - Assign shortcuts to an app from the actions menu: "Manage Hot Keys" (Cmd+K)
    - An app can have any number of shortcuts, and each one either activates the app or opens a new window. That gives an app a shortcut for each action.
-   - Detect conflicting shortcuts
-   - Show an app's assigned shortcuts in its launcher row
+   - An Open shortcut does nothing when its app is already in front. It doesn't hide the app.
+   - Apps are matched by bundle identifier, which stays the same across updates. Apps without one fall back to their path and can't sync, the same as hidden apps.
+   - Detect conflicting shortcuts: the same keys can't be used by two app shortcuts or by an app shortcut and the launcher. The recorder warns about shortcuts the system uses. Shortcuts other apps register can't be detected.
+   - Each shortcut has a "Sync to other Macs" choice, stored for slice 10
+   - Shortcuts keep working for hidden apps
+   - Show an app's assigned shortcuts in its launcher row, up to two, then a count
+   - An App Hot Keys window, opened from the menu bar menu or with Cmd+Option+K while the panel has focus, lists every app with shortcuts, including apps no longer on this Mac, with a way to edit them. It's a separate window like Hidden Apps, to keep Settings short.
 
 10. **iCloud sync**
     - Shortcut settings sync through iCloud key-value storage

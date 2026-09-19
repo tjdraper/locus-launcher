@@ -5,6 +5,7 @@ import SwiftUI
 /// through hundreds of apps.
 struct AppBrowseTable: NSViewRepresentable {
     let list: BrowseList
+    let shortcutLabels: [String: String]
     let controller: AppBrowseTableController
 
     func makeNSView(context _: Context) -> NSScrollView {
@@ -12,7 +13,7 @@ struct AppBrowseTable: NSViewRepresentable {
     }
 
     func updateNSView(_: NSScrollView, context _: Context) {
-        controller.show(list)
+        controller.show(list, shortcutLabels: shortcutLabels)
     }
 }
 

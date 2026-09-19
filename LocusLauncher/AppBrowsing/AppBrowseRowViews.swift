@@ -41,6 +41,7 @@ final class AppBrowseCellView: NSTableCellView {
 
     private(set) var appURL: URL?
     private let caret = ActionsCaretView()
+    private let shortcuts = NSTextField(labelWithString: "")
     private var caretTrailing: NSLayoutConstraint?
 
     init() {
@@ -54,8 +55,12 @@ final class AppBrowseCellView: NSTableCellView {
         name.lineBreakMode = .byTruncatingTail
         name.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         caret.isHidden = true
+        shortcuts.font = .preferredFont(forTextStyle: .body)
+        shortcuts.textColor = .secondaryLabelColor
+        shortcuts.setContentCompressionResistancePriority(.required, for: .horizontal)
+        shortcuts.setContentHuggingPriority(.required, for: .horizontal)
 
-        for view in [icon, name, caret] {
+        for view in [icon, name, shortcuts, caret] {
             view.translatesAutoresizingMaskIntoConstraints = false
             addSubview(view)
         }
@@ -70,11 +75,13 @@ final class AppBrowseCellView: NSTableCellView {
             icon.widthAnchor.constraint(equalToConstant: AppIconCache.pointSize),
             icon.heightAnchor.constraint(equalToConstant: AppIconCache.pointSize),
             name.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 12),
-            name.trailingAnchor.constraint(
-                lessThanOrEqualTo: caret.centerXAnchor,
+            name.trailingAnchor.constraint(lessThanOrEqualTo: shortcuts.leadingAnchor, constant: -12),
+            name.centerYAnchor.constraint(equalTo: icon.centerYAnchor),
+            shortcuts.trailingAnchor.constraint(
+                equalTo: caret.centerXAnchor,
                 constant: -AppBrowseRowMetrics.caretAreaWidth / 2
             ),
-            name.centerYAnchor.constraint(equalTo: icon.centerYAnchor),
+            shortcuts.firstBaselineAnchor.constraint(equalTo: name.firstBaselineAnchor),
             caretTrailing,
             caret.centerYAnchor.constraint(equalTo: icon.centerYAnchor),
         ])
@@ -88,6 +95,7 @@ final class AppBrowseCellView: NSTableCellView {
     override var backgroundStyle: NSView.BackgroundStyle {
         didSet {
             caret.isHidden = backgroundStyle != .emphasized
+            shortcuts.textColor = backgroundStyle == .emphasized ? .alternateSelectedControlTextColor : .secondaryLabelColor
         }
     }
 
@@ -95,10 +103,11 @@ final class AppBrowseCellView: NSTableCellView {
         caret.pointDown(isOpen, animated: true)
     }
 
-    func show(_ app: IndexedApp, icon: NSImage, reservesLetterIndex: Bool) {
+    func show(_ app: IndexedApp, icon: NSImage, shortcuts shortcutLabel: String?, reservesLetterIndex: Bool) {
         appURL = app.url
         caret.pointDown(false, animated: false)
         textField?.stringValue = app.name
+        shortcuts.stringValue = shortcutLabel ?? ""
         imageView?.image = icon
         caretTrailing?.constant = -(AppBrowseRowMetrics.trailingInset(reservesLetterIndex: reservesLetterIndex)
             + AppBrowseRowMetrics.caretAreaWidth / 2)

@@ -13,7 +13,7 @@ struct AppActionTests {
         ]
 
         // Act
-        let actions = keys.map { AppAction(keyCode: $0.0, modifierFlags: $0.1) }
+        let actions = keys.map { AppAction(keyCode: $0.0, characters: nil, modifierFlags: $0.1) }
 
         // Assert
         #expect(actions == [.open, .newWindow, .revealInFinder, .hide])
@@ -25,7 +25,7 @@ struct AppActionTests {
         let flags: NSEvent.ModifierFlags = [.command, .numericPad, .function]
 
         // Act
-        let action = AppAction(keyCode: 76, modifierFlags: flags)
+        let action = AppAction(keyCode: 76, characters: nil, modifierFlags: flags)
 
         // Assert
         #expect(action == .revealInFinder)
@@ -42,10 +42,34 @@ struct AppActionTests {
         ]
 
         // Act
-        let actions = keys.map { AppAction(keyCode: $0.0, modifierFlags: $0.1) }
+        let actions = keys.map { AppAction(keyCode: $0.0, characters: nil, modifierFlags: $0.1) }
 
         // Assert
         #expect(actions.allSatisfy { $0 == nil })
+    }
+
+    @Test
+    func matchesLetterShortcutsByTheCharacterTyped() {
+        // Arrange
+        struct KeyPress {
+            let keyCode: UInt16
+            let characters: String
+            let modifiers: NSEvent.ModifierFlags
+        }
+        let keys = [
+            KeyPress(keyCode: 40, characters: "k", modifiers: .command),
+            // The key that types K on Dvorak.
+            KeyPress(keyCode: 9, characters: "k", modifiers: .command),
+            KeyPress(keyCode: 40, characters: "k", modifiers: []),
+            KeyPress(keyCode: 40, characters: "K", modifiers: [.command, .shift]),
+            KeyPress(keyCode: 40, characters: "j", modifiers: .command),
+        ]
+
+        // Act
+        let actions = keys.map { AppAction(keyCode: $0.keyCode, characters: $0.characters, modifierFlags: $0.modifiers) }
+
+        // Assert
+        #expect(actions == [.manageShortcuts, .manageShortcuts, nil, nil, nil])
     }
 
     @Test
@@ -54,6 +78,6 @@ struct AppActionTests {
         let symbols = AppAction.allCases.map(\.shortcutSymbols)
 
         // Assert
-        #expect(symbols == ["↩", "⌥⌘↩", "⌘↩", "⌥⌘⌫"])
+        #expect(symbols == ["↩", "⌥⌘↩", "⌘↩", "⌘K", "⌥⌘⌫"])
     }
 }

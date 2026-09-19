@@ -6,10 +6,13 @@ final class LauncherPanelPresenter {
 
     private let settings: SettingsWindowPresenter
     private let hiddenAppsWindow: HiddenAppsWindowPresenter
+    private let appShortcutsWindow: AppShortcutsWindowPresenter
+    private let shortcutEditor: AppShortcutEditorWindowPresenter
     private let updates: UpdateController
     private let appIndex: AppIndexStore
     private let appIcons: AppIconCache
     private let hiddenApps: HiddenAppsStore
+    private let appShortcuts: AppShortcutStore
     private let newWindowOpener: NewWindowOpener
     private let launchHistory = LaunchHistoryStore()
     private lazy var panel = LauncherPanel(
@@ -24,6 +27,10 @@ final class LauncherPanelPresenter {
             self?.dismiss()
             self?.hiddenAppsWindow.show()
         },
+        onOpenAppShortcuts: { [weak self] in
+            self?.dismiss()
+            self?.appShortcutsWindow.show()
+        },
         onKeyCommand: { [weak self] command in
             self?.perform(command)
         }
@@ -35,19 +42,25 @@ final class LauncherPanelPresenter {
     init(
         settings: SettingsWindowPresenter,
         hiddenAppsWindow: HiddenAppsWindowPresenter,
+        appShortcutsWindow: AppShortcutsWindowPresenter,
+        shortcutEditor: AppShortcutEditorWindowPresenter,
         updates: UpdateController,
         appIndex: AppIndexStore,
         appIcons: AppIconCache,
         hiddenApps: HiddenAppsStore,
-        accessibilityAccess: AccessibilityAccessStore
+        appShortcuts: AppShortcutStore,
+        newWindowOpener: NewWindowOpener
     ) {
         self.settings = settings
         self.hiddenAppsWindow = hiddenAppsWindow
+        self.appShortcutsWindow = appShortcutsWindow
+        self.shortcutEditor = shortcutEditor
         self.updates = updates
         self.appIndex = appIndex
         self.appIcons = appIcons
         self.hiddenApps = hiddenApps
-        newWindowOpener = NewWindowOpener(access: accessibilityAccess)
+        self.appShortcuts = appShortcuts
+        self.newWindowOpener = newWindowOpener
     }
 
     func toggle() {
@@ -99,6 +112,7 @@ final class LauncherPanelPresenter {
             LauncherPanelView(
                 appIndex: appIndex,
                 hiddenApps: hiddenApps,
+                appShortcuts: appShortcuts,
                 search: search,
                 browse: browse,
                 updates: updates
@@ -141,6 +155,9 @@ final class LauncherPanelPresenter {
         case .revealInFinder:
             NSWorkspace.shared.activateFileViewerSelecting([app.url])
             dismissAndEndSession()
+        case .manageShortcuts:
+            dismiss()
+            shortcutEditor.show(app)
         case .hide:
             hiddenApps.hide(app)
         }

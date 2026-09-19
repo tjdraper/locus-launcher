@@ -7,14 +7,21 @@ import SwiftUI
 final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
     private let updates: UpdateController
     private let accessibilityAccess: AccessibilityAccessStore
+    private let appShortcuts: AppShortcutStore
     private let dockIcon: DockIconPresence
     private let launchAtLogin = LaunchAtLoginStore()
     private let spotlight = SpotlightShortcutStore()
     private lazy var window = makeWindow()
 
-    init(updates: UpdateController, accessibilityAccess: AccessibilityAccessStore, dockIcon: DockIconPresence) {
+    init(
+        updates: UpdateController,
+        accessibilityAccess: AccessibilityAccessStore,
+        appShortcuts: AppShortcutStore,
+        dockIcon: DockIconPresence
+    ) {
         self.updates = updates
         self.accessibilityAccess = accessibilityAccess
+        self.appShortcuts = appShortcuts
         self.dockIcon = dockIcon
     }
 
@@ -34,7 +41,8 @@ final class SettingsWindowPresenter: NSObject, NSWindowDelegate {
                 updates: updates,
                 launchAtLogin: launchAtLogin,
                 spotlight: spotlight,
-                accessibilityAccess: accessibilityAccess
+                accessibilityAccess: accessibilityAccess,
+                appShortcuts: appShortcuts
             )
         ))
         window.title = "Locus Launcher Settings"

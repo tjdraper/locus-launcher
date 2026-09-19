@@ -3,6 +3,7 @@ import SwiftUI
 struct LauncherPanelView: View {
     let appIndex: AppIndexStore
     let hiddenApps: HiddenAppsStore
+    let appShortcuts: AppShortcutStore
     @Bindable var search: AppSearchSession
     let browse: AppBrowseTableController
     let updates: UpdateController
@@ -30,7 +31,7 @@ struct LauncherPanelView: View {
 
             Divider()
 
-            AppBrowseView(list: list, controller: browse)
+            AppBrowseView(list: list, shortcutLabels: AppShortcutRowLabels.make(from: appShortcuts.list), controller: browse)
                 .overlay {
                     if list.rows.isEmpty, !search.query.isEmpty {
                         Text("No Matching Apps")
@@ -59,6 +60,7 @@ struct LauncherPanelView: View {
     LauncherPanelView(
         appIndex: AppIndexStore(),
         hiddenApps: HiddenAppsStore(),
+        appShortcuts: AppShortcutStore(),
         search: AppSearchSession(history: LaunchHistory()),
         browse: AppBrowseTableController(icons: AppIconCache()) { _, _ in
             // Previews don't launch apps.
