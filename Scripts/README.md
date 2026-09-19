@@ -14,6 +14,18 @@ The script refuses to run unless the branch is clean, has an upstream, and is ex
 
 If a release fails partway, undo the version bump and the appcast entry with `git checkout -- "Locus Launcher.xcodeproj/project.pbxproj" docs`.
 
+## Testing a notarized build
+
+```
+Scripts/install-test-build.sh
+```
+
+Builds, notarizes, and staples the working tree as it is, without bumping the version or touching the appcast. It then quits the copy running from `/Applications`, moves that copy to the Trash, installs the new build in its place, and opens it. A Debug copy running from Xcode is left alone.
+
+Use it for anything that needs Accessibility access. The Debug build can't get the grant, but this build is signed like a release, so it keeps the grant the released app already has.
+
+The build keeps whatever version the project currently has, so Sparkle may offer to replace it with a newer release.
+
 ## Versions and the beta channel
 
 Versions are `YYYY.N` for a release and `YYYY.N.B` for a beta. Betas leading to `2026.4` are numbered `2026.3.1`, `2026.3.2` and so on: each sits above the `2026.3` release and below the `2026.4` it becomes. A year starts its betas at `YYYY.0.1` and its first release at `YYYY.1`.
