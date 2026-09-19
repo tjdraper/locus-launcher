@@ -5,7 +5,7 @@ import SwiftUI
 /// while a check is already running.
 @Observable
 final class UpdateController {
-    private let channelSelector: UpdateChannelSelector
+    private let updaterDelegate: UpdaterDelegate
     private let reminder: UpdateReminder
     private let updaterController: SPUStandardUpdaterController
     private var readinessObservation: NSKeyValueObservation?
@@ -43,12 +43,12 @@ final class UpdateController {
 
     init() {
         let reminder = UpdateReminder()
-        let channels = UpdateChannelSelector()
+        let updaterDelegate = UpdaterDelegate(reminder: reminder)
         self.reminder = reminder
-        channelSelector = channels
+        self.updaterDelegate = updaterDelegate
         updaterController = SPUStandardUpdaterController(
             startingUpdater: false,
-            updaterDelegate: channels,
+            updaterDelegate: updaterDelegate,
             userDriverDelegate: reminder
         )
         readinessObservation = updaterController.updater.observe(
@@ -69,15 +69,35 @@ final class UpdateController {
     /// Also brings a waiting update's window forward. Sparkle doesn't announce that, so the app
     /// comes to the front first.
     func checkForUpdates() {
+        reminder.userWillCheckForUpdates()
         AppActivation.bringToFront()
         updaterController.checkForUpdates(nil)
     }
 }
 
-/// Beta items in the appcast are only offered to updaters that name the channel here. Everyone
-/// else sees the default channel alone.
-private final class UpdateChannelSelector: NSObject, SPUUpdaterDelegate {
+private final class UpdaterDelegate: NSObject, SPUUpdaterDelegate {
+    private let reminder: UpdateReminder
+
+    init(reminder: UpdateReminder) {
+        self.reminder = reminder
+    }
+
+    /// Beta items in the appcast are only offered to updaters that name the channel here.
+    /// Everyone else sees the default channel alone.
     nonisolated func allowedChannels(for _: SPUUpdater) -> Set<String> {
         UpdateChannelPreference().allowedChannels
+    }
+
+    nonisolated func updater(
+        _: SPUUpdater,
+        userDidMake choice: SPUUserUpdateChoice,
+        forUpdate updateItem: SUAppcastItem,
+        state _: SPUUserUpdateState
+    ) {
+        let version = updateItem.displayVersionString
+        // Sparkle calls its delegates on the main thread.
+        MainActor.assumeIsolated {
+            reminder.userDidMake(choice, forVersion: version)
+        }
     }
 }

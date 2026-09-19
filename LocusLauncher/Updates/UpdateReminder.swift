@@ -4,12 +4,31 @@ import SwiftUI
 /// Keeps an update found by a scheduled check out of the user's way. Instead of Sparkle's window
 /// jumping to the front, the update waits behind a quiet sign in the menu and the launcher panel
 /// until the user asks to see it. https://sparkle-project.org/documentation/gentle-reminders
+/// An update the user saw and put off keeps the sign up too, so it isn't forgotten.
 ///
 /// Without a Dock icon there is nothing to bring the app forward, so Sparkle's windows would
 /// otherwise open behind whatever the user is working in.
 @Observable
 final class UpdateReminder: NSObject, SPUStandardUserDriverDelegate {
-    private(set) var waitingVersion: String?
+    var waitingVersion: String? {
+        scheduledVersion ?? dismissedVersion
+    }
+
+    /// Found by a scheduled check, and held by Sparkle until the user looks at it.
+    private var scheduledVersion: String?
+    /// Seen and put off. Sparkle ends its session and forgets the update, so clicking the sign
+    /// starts a new check, which shows the window again.
+    private var dismissedVersion: String?
+
+    /// Called by the updater's delegate, just before Sparkle ends the session.
+    func userDidMake(_ choice: SPUUserUpdateChoice, forVersion version: String) {
+        dismissedVersion = choice == .dismiss ? version : nil
+    }
+
+    /// The check finds the update again if it's still there.
+    func userWillCheckForUpdates() {
+        dismissedVersion = nil
+    }
 
     nonisolated var supportsGentleScheduledUpdateReminders: Bool {
         true
@@ -34,20 +53,20 @@ final class UpdateReminder: NSObject, SPUStandardUserDriverDelegate {
             if handleShowingUpdate {
                 AppActivation.bringToFront()
             } else {
-                waitingVersion = version
+                scheduledVersion = version
             }
         }
     }
 
     nonisolated func standardUserDriverDidReceiveUserAttention(forUpdate _: SUAppcastItem) {
         onMain {
-            waitingVersion = nil
+            scheduledVersion = nil
         }
     }
 
     nonisolated func standardUserDriverWillFinishUpdateSession() {
         onMain {
-            waitingVersion = nil
+            scheduledVersion = nil
         }
     }
 
