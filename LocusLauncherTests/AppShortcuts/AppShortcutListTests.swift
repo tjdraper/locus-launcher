@@ -95,6 +95,22 @@ struct AppShortcutListTests {
     }
 
     @Test
+    func releasesKeysForTheLauncherByRemovingTheirHotKey() {
+        // Arrange
+        var list = AppShortcutList()
+        let safariEntry = list.add(for: safari)
+        list.setKeys(keysS, for: safariEntry)
+        let toolEntry = list.add(for: tool)
+        list.setKeys(keysW, for: toolEntry)
+
+        // Act
+        list.releaseKeys(keysS)
+
+        // Assert
+        #expect(list.entries.map(\.id) == [toolEntry])
+    }
+
+    @Test
     func removesEveryHotKeyForOneApp() {
         // Arrange
         var list = AppShortcutList()

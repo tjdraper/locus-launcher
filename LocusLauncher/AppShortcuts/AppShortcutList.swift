@@ -100,6 +100,11 @@ nonisolated struct AppShortcutList: Codable, Equatable, Sendable {
         }
     }
 
+    /// Frees the keys for the launcher by removing the entry that has them.
+    mutating func releaseKeys(_ keys: Keys) {
+        entries.removeAll { $0.keys == keys }
+    }
+
     mutating func setAction(_ action: Action, for id: UUID) {
         guard let index = entries.firstIndex(where: { $0.id == id }) else { return }
         entries[index].action = action

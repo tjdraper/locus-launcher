@@ -1,5 +1,4 @@
 import AppKit
-import KeyboardShortcuts
 import SwiftUI
 
 struct SettingsView: View {
@@ -16,17 +15,7 @@ struct SettingsView: View {
             }
 
             Section("Launcher") {
-                KeyboardShortcuts.Recorder("Launcher shortcut", name: .toggleLauncher) { _ in
-                    spotlight.refresh()
-                }
-                .shortcutValidation { shortcut in
-                    AppShortcutConflictCheck(store: appShortcuts).conflict(for: shortcut, recording: .launcher)
-                        .map { .disallow(reason: $0.reason) } ?? .allow
-                }
-                // The only menu is this app's own, which exists while Settings is open. AppKit fills
-                // it with items like Emoji & Symbols, and a global hotkey fires before any menu sees
-                // the keys, so those are never real conflicts.
-                .keyboardShortcutsConflictPolicy(.init(menuItem: .allow))
+                LauncherShortcutRow(appShortcuts: appShortcuts, spotlight: spotlight)
                 SpotlightShortcutRows(store: spotlight)
             }
 

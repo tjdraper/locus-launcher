@@ -65,17 +65,11 @@ struct AppShortcutEditorView: View {
 }
 
 private struct AppShortcutRow: View {
-    /// Keys the user recorded that something else already uses. They stay in the recorder, marked,
-    /// so the user sees what they pressed, but the entry keeps no keys.
-    private struct Rejected {
-        let shortcut: KeyboardShortcuts.Shortcut
-        let conflict: AppShortcutConflictCheck.Conflict
-    }
-
     let entry: AppShortcutList.Entry
     let store: AppShortcutStore
 
-    @State private var rejected: Rejected?
+    /// The entry keeps no keys while its recorder shows rejected ones.
+    @State private var rejected: RejectedShortcut?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -84,25 +78,9 @@ private struct AppShortcutRow: View {
                 controls
             }
             if let rejected {
-                HStack {
-                    Text(rejected.conflict.reason)
-                        .font(.callout)
-                        .foregroundStyle(Color(nsColor: .systemRed))
-                    // The launcher's shortcut isn't offered, since taking it would leave the
-                    // launcher with none.
-                    if case .appShortcut = rejected.conflict {
-                        Button("Use Here Instead") {
-                            self.rejected = nil
-                            store.takeKeys(AppShortcutList.Keys(rejected.shortcut), for: entry.id)
-                        }
-                        .controlSize(.small)
-                    }
-                }
+                ShortcutConflictNote(reason: rejected.conflict.reason, onUseHere: useHereAction(for: rejected))
             } else if entry.keys?.shortcut.isTakenBySystem == true {
-                Label("macOS also uses this shortcut, so it may not work.", systemImage: "exclamationmark.triangle.fill")
-                    .font(.callout)
-                    .symbolRenderingMode(.multicolor)
-                    .foregroundStyle(.secondary)
+                SystemShortcutNote()
             }
         }
     }
@@ -115,17 +93,21 @@ private struct AppShortcutRow: View {
             onChange: record
         )
         .fixedSize()
-        .overlay {
-            if rejected != nil {
-                Capsule()
-                    .strokeBorder(Color(nsColor: .systemRed), lineWidth: 2)
-            }
+        .rejectedShortcutOutline(rejected != nil)
+    }
+
+    /// The launcher's shortcut isn't offered, since taking it would leave the launcher with none.
+    private func useHereAction(for rejected: RejectedShortcut) -> (() -> Void)? {
+        guard case .appShortcut = rejected.conflict else { return nil }
+        return {
+            self.rejected = nil
+            store.takeKeys(AppShortcutList.Keys(rejected.shortcut), for: entry.id)
         }
     }
 
     private func record(_ shortcut: KeyboardShortcuts.Shortcut?) {
         if let shortcut, let conflict = AppShortcutConflictCheck(store: store).conflict(for: shortcut, recording: .appShortcut(entry.id)) {
-            rejected = Rejected(shortcut: shortcut, conflict: conflict)
+            rejected = RejectedShortcut(shortcut: shortcut, conflict: conflict)
             store.setKeys(nil, for: entry.id)
         } else {
             rejected = nil

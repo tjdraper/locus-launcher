@@ -36,6 +36,10 @@ final class AppShortcutStore {
         list.takeKeys(keys, for: id)
     }
 
+    func releaseKeys(_ keys: AppShortcutList.Keys) {
+        list.releaseKeys(keys)
+    }
+
     func setAction(_ action: AppShortcutList.Action, for id: UUID) {
         list.setAction(action, for: id)
     }

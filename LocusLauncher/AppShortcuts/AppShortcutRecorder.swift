@@ -26,10 +26,10 @@ struct AppShortcutRecorder: NSViewRepresentable {
         let recorder = KeyboardShortcuts.RecorderCocoa(shortcut: shortcut) { shortcut in
             coordinator.onChange(shortcut)
         }
-        // The only menu is this app's own, which exists while this window is open. AppKit fills it
-        // with items like Emoji & Symbols, and a global hotkey fires before any menu sees the keys,
-        // so those are never real conflicts. System shortcuts are flagged under the row instead of
-        // in an alert.
+        // The only menu is this app's own, which exists while one of its windows is open. AppKit
+        // fills it with items like Emoji & Symbols, and a global hotkey fires before any menu sees
+        // the keys, so those are never real conflicts. System shortcuts are flagged under the
+        // recorder instead of in an alert.
         recorder.conflictPolicy = .init(menuItem: .allow, systemShortcut: .allow)
         if recordsOnAppear {
             // SwiftUI puts the view in its window after this returns.
