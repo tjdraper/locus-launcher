@@ -6,8 +6,9 @@ struct RememberedWindowPlacement {
 
     /// Call once, before the window is first shown.
     func apply(to window: NSWindow) {
-        // `NSWindow.center()` runs before SwiftUI has sized the window, so it lands off center.
-        window.layoutIfNeeded()
+        // A window built from a hosting controller measures 1x32 until something asks its content
+        // for a size. `layoutIfNeeded()` and `layoutSubtreeIfNeeded()` don't; reading `fittingSize` does.
+        window.setContentSize(window.contentView?.fittingSize ?? window.frame.size)
         let fittedSize = window.frame.size
         let restored = window.setFrameUsingName(autosaveName)
         window.setFrameAutosaveName(autosaveName)
