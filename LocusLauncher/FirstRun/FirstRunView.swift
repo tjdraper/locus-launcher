@@ -9,61 +9,66 @@ struct FirstRunView: View {
     let spotlight: SpotlightShortcutStore
     let accessibilityAccess: AccessibilityAccessStore
     let appShortcuts: AppShortcutStore
+    let screenFit: ScreenFit
     let onDone: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            Form {
+        Form {
+            Section {
+                welcome
+            }
+
+            if ApplicationsFolderMoveWorkflow.isAvailable {
                 Section {
-                    welcome
-                }
-
-                if ApplicationsFolderMoveWorkflow.isAvailable {
-                    Section {
-                        ApplicationsFolderRow()
-                    }
-                }
-
-                Section {
-                    LauncherShortcutRow(appShortcuts: appShortcuts, spotlight: spotlight)
-                    SpotlightShortcutRows(store: spotlight)
-                } header: {
-                    Text("Launcher")
-                } footer: {
-                    Text("Press the shortcut in any app to open the launcher.")
-                        .foregroundStyle(.secondary)
-                }
-
-                Section {
-                    AccessibilityAccessRow(store: accessibilityAccess)
-                } header: {
-                    Text("Permissions")
-                } footer: {
-                    Text("""
-                    Optional. New Window and new-window hot keys press ⌘N in the app, which needs \
-                    Accessibility access. Skip it if you don’t need them, and allow it later in Settings.
-                    """)
-                    .foregroundStyle(.secondary)
-                }
-
-                Section {
-                    LaunchAtLoginToggle(store: launchAtLogin)
-                }
-
-                Section("Updates") {
-                    Toggle("Check for updates automatically", isOn: $updates.automaticallyChecksForUpdates)
+                    ApplicationsFolderRow()
                 }
             }
-            .formStyle(.grouped)
 
+            Section {
+                LauncherShortcutRow(appShortcuts: appShortcuts, spotlight: spotlight)
+                SpotlightShortcutRows(store: spotlight)
+            } header: {
+                Text("Launcher")
+            } footer: {
+                Text("Press the shortcut in any app to open the launcher.")
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                AccessibilityAccessRow(store: accessibilityAccess)
+            } header: {
+                Text("Permissions")
+            } footer: {
+                Text("""
+                Optional. New Window and new-window hot keys press ⌘N in the app, which needs \
+                Accessibility access. Skip it if you don’t need them, and allow it later in Settings.
+                """)
+                .foregroundStyle(.secondary)
+            }
+
+            Section {
+                LaunchAtLoginToggle(store: launchAtLogin)
+            }
+
+            Section("Updates") {
+                Toggle("Check for updates automatically", isOn: $updates.automaticallyChecksForUpdates)
+            }
+        }
+        .formStyle(.grouped)
+        .scrollBounceBehavior(.basedOnSize)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
             HStack {
                 Spacer()
                 Button("Done", action: onDone)
                     .keyboardShortcut(.defaultAction)
             }
-            .padding([.horizontal, .bottom], 20)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+            .glassEffect(.regular, in: .rect)
         }
         .frame(width: 480)
+        // Only as tall as the steps need, unless the screen is shorter, when the steps scroll.
+        .frame(maxHeight: screenFit.maxContentHeight)
         .fixedSize()
         .task {
             refresh()
@@ -103,6 +108,7 @@ struct FirstRunView: View {
         spotlight: SpotlightShortcutStore(),
         accessibilityAccess: AccessibilityAccessStore(),
         appShortcuts: AppShortcutStore(),
+        screenFit: ScreenFit(),
         onDone: { print("Done") }
     )
 }
