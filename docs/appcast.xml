@@ -3,6 +3,16 @@
     <channel>
         <title>Locus Launcher</title>
         <item>
+            <title>2026.1</title>
+            <pubDate>Tue, 29 Sep 2026 14:50:39 -0500</pubDate>
+            <link>https://github.com/tjdraper/locus-launcher</link>
+            <sparkle:version>2026.1</sparkle:version>
+            <sparkle:shortVersionString>2026.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:releaseNotesLink>https://tjdraper.github.io/locus-launcher/LocusLauncher-2026.1.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.1/LocusLauncher-2026.1.zip" length="3529049" type="application/octet-stream" sparkle:edSignature="w70wCP6N9M6Gad9D+ZZ65rLi9kavjpn4eWvT86ViQ6PM6TuGTOthraIPddyB9LmkkKo/qKCpWTiVKfYEqOQJCA=="/>
+        </item>
+        <item>
             <title>2026.0.17</title>
             <pubDate>Thu, 24 Sep 2026 16:28:40 -0500</pubDate>
             <link>https://github.com/tjdraper/locus-launcher</link>
@@ -12,28 +22,6 @@
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
             <sparkle:releaseNotesLink>https://tjdraper.github.io/locus-launcher/LocusLauncher-2026.0.17.md</sparkle:releaseNotesLink>
             <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.0.17/LocusLauncher-2026.0.17.zip" length="3529063" type="application/octet-stream" sparkle:edSignature="vlFUYF/RDHX5512NQHiEluOLPRVhA8CN+alH0LPZkfX6Myo67QAS2FiWH34P6nlgX8JRzkCsnwdeET3RNfPSBw=="/>
-        </item>
-        <item>
-            <title>2026.0.16</title>
-            <pubDate>Wed, 23 Sep 2026 14:26:01 -0500</pubDate>
-            <link>https://github.com/tjdraper/locus-launcher</link>
-            <sparkle:channel>beta</sparkle:channel>
-            <sparkle:version>2026.0.16</sparkle:version>
-            <sparkle:shortVersionString>2026.0.16</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <sparkle:releaseNotesLink>https://tjdraper.github.io/locus-launcher/LocusLauncher-2026.0.16.md</sparkle:releaseNotesLink>
-            <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.0.16/LocusLauncher-2026.0.16.zip" length="3521981" type="application/octet-stream" sparkle:edSignature="qfFXT1L/2QBhdW0aJ2M3NAKUI1/iOGcTUTzafiES5Z9XOmIiEgTA3Vjct/nmLoFM9XhKbottRWxGdY5r0Nj8BA=="/>
-        </item>
-        <item>
-            <title>2026.0.15</title>
-            <pubDate>Sat, 19 Sep 2026 17:49:13 -0500</pubDate>
-            <link>https://github.com/tjdraper/locus-launcher</link>
-            <sparkle:channel>beta</sparkle:channel>
-            <sparkle:version>2026.0.15</sparkle:version>
-            <sparkle:shortVersionString>2026.0.15</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <sparkle:releaseNotesLink>https://tjdraper.github.io/locus-launcher/LocusLauncher-2026.0.15.md</sparkle:releaseNotesLink>
-            <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.0.15/LocusLauncher-2026.0.15.zip" length="3521974" type="application/octet-stream" sparkle:edSignature="MXYuYxU7V7gMJBQmONiLEo+DNTMbyYRsZLRvNSRka3I6yUptX+bQ4Xhwep8uxmtslF9zU1M9gXmTpJQ3AVkHDg=="/>
         </item>
         <item>
             <title>2026.0.3</title>
@@ -53,15 +41,6 @@
             <sparkle:shortVersionString>2026.0.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.0.2/LocusLauncher-2026.0.2.zip" length="2540122" type="application/octet-stream" sparkle:edSignature="e9p2fqFZDgAxDIVbW9JP4mejvf8JjGdiw2Ggsw/uDhPcE8pUgDOO9oipvPMAT7ktXLuilbxXHN1n3nwFFs5kAQ=="/>
-        </item>
-        <item>
-            <title>2026.0.1</title>
-            <pubDate>Thu, 17 Sep 2026 16:17:14 -0500</pubDate>
-            <link>https://github.com/tjdraper/locus-launcher</link>
-            <sparkle:version>2026.0.1</sparkle:version>
-            <sparkle:shortVersionString>2026.0.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/tjdraper/locus-launcher/releases/download/v2026.0.1/LocusLauncher-2026.0.1.zip" length="2540143" type="application/octet-stream" sparkle:edSignature="n4dJl/wT9wCHSLwOki8z9E5bXN7HnoT/FQzaCoTFrW59LqtlRMbli0tbb2IjSt3ZBsu05IYtWX3AdLqoNFiTCA=="/>
         </item>
     </channel>
 </rss>
