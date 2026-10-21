@@ -105,6 +105,10 @@ The Xcode `BuildProject` MCP tool builds whichever scheme and destination Xcode 
 
 Check the build log at warning severity and fix any warnings (including SwiftLint violations) before declaring work done.
 
+## Using the Mac
+
+The user is usually working at the Mac while you work. Don't drive it without asking first: no scripted keystrokes or clicks, no bringing apps to the front or quitting them, and no installing a test build over a running copy. Do everything else first, then ask (a question notifies the user). If no answer comes, the user has probably stepped away, so wait for it. When the user has said they've left the computer to you, go ahead without asking.
+
 ## Tests
 
 `Locus Launcher Tests` does not run inside the app, because a hosted test run would launch it, register the global hotkey and start Sparkle. It compiles only the app files it tests. To put another app file under test, add it to the "Locus Launcher Tests" target membership (the membership exception set on the `LocusLauncher` folder in `project.pbxproj`). Only pure, `nonisolated` code with no dependencies on the rest of the app belongs there.
