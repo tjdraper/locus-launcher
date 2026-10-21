@@ -87,7 +87,9 @@ Other rules:
 
 ## Git
 
-Do not stage, commit, push, or run any destructive git commands without explicit instruction. Reading git state (status, log, diff) is fine.
+Run no git command that changes anything unless the user explicitly tells you to run it. That covers creating, switching, renaming, or deleting branches, checking out, staging, committing, stashing, tagging, fetching, pulling, pushing, merging, rebasing, and resetting. Reading git state (status, log, diff, show, blame) is fine.
+
+When the user talks about how the work will be done, such as "let's do this in a branch", they're describing the plan, for the plan's documents. It isn't an instruction to run anything. The user will say plainly when they want a git command run.
 
 The user may intentionally stage acceptable work before asking for further changes. Do not treat staged changes as a problem, and do not unstage files unless explicitly asked. When reporting repo state, distinguish staged and unstaged changes only if it matters for the task.
 
